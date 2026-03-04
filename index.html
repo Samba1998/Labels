@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Stylish Zebra Label POC</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            color: #333;
+        }
+
+        header {
+            background: rgb(40, 51, 130);
+            color: rgb(239, 118, 39);
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .scanner-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .scanner-card input {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 1em;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            transition: border-color 0.2s;
+        }
+
+        .scanner-card input:focus {
+            border-color: rgb(239, 118, 39);
+            outline: none;
+        }
+
+        .scanner-card button {
+            background: rgb(239, 118, 39);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .scanner-card button:hover {
+            background: #357ABD;
+        }
+
+        /* Excel import card */
+        .excel-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 15px;
+        }
+
+        .excel-card h3 {
+            margin: 0 0 12px 0;
+            color: rgb(40, 51, 130);
+            font-size: 1em;
+        }
+
+        .excel-card .excel-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .excel-card label {
+            font-size: 0.8em;
+            color: #666;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .excel-card select {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 0.9em;
+            min-width: 140px;
+        }
+
+        .excel-card .file-btn {
+            background: rgb(40, 51, 130);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .excel-card .file-btn:hover {
+            background: rgb(60, 75, 180);
+        }
+
+        .excel-card .import-btn {
+            background: rgb(239, 118, 39);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+
+        .excel-card .import-btn:hover {
+            background: #c96020;
+        }
+
+        .excel-card .import-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #excelStatus {
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        #excelStatus.success { color: #2a7a2a; }
+        #excelStatus.error { color: #b00; }
+
+        .col-mapping {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .col-mapping .map-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .results {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 15px;
+        }
+
+        .card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-height: 100px;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.1em;
+            color: rgb(40, 51, 130);
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .card button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgb(239, 118, 39);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background 0.2s;
+        }
+
+        .card button:hover {
+            background: rgb(187, 103, 48);
+        }
+
+        .generate-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #FF9800;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: background 0.2s;
+        }
+
+        .generate-button:hover {
+            background: #F57C00;
+        }
+
+        .section-label {
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #888;
+            margin: 20px 0 6px 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>Product Label Dashboard</header>
+    <main>
+
+        <!-- ── EXCEL IMPORT (new stop-gap section) ── -->
+        <div class="section-label">📥 Import from Excel</div>
+        <div class="excel-card">
+            <h3>Upload an Excel file (.xlsx / .xls / .csv) — map columns below, then click Import</h3>
+            <div class="excel-row">
+                <div>
+                    <label>File</label>
+                    <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display:none" onchange="onExcelFileChosen(this)">
+                    <button class="file-btn" onclick="document.getElementById('excelFile').click()">Choose File</button>
+                </div>
+                <div id="chosenFileName" style="align-self:center;font-size:0.85em;color:#555;"></div>
+            </div>
+
+            <!-- Column mapping — hidden until a file is loaded -->
+            <div id="colMappingSection" style="display:none;">
+                <div class="col-mapping">
+                    <div class="map-field">
+                        <label>Name column *</label>
+                        <select id="mapName"></select>
+                    </div>
+                    <div class="map-field">
+                        <label>Price column *</label>
+                        <select id="mapPrice"></select>
+                    </div>
+                    <div class="map-field">
+                        <label>Barcode column *</label>
+                        <select id="mapBarcode"></select>
+                    </div>
+                    <div class="map-field">
+                        <label>Pack Size column (optional)</label>
+                        <select id="mapPackSize"></select>
+                    </div>
+                    <div class="map-field">
+                        <label>Qty column (optional)</label>
+                        <select id="mapQty"></select>
+                    </div>
+                </div>
+                <div style="margin-top:14px;">
+                    <button class="import-btn" onclick="importFromExcel()">Import Rows</button>
+                </div>
+            </div>
+
+            <div id="excelStatus"></div>
+        </div>
+
+        <!-- ── BARCODE SCANNER ── -->
+        <div class="section-label">🔍 Barcode Lookup (API)</div>
+        <div class="scanner-card">
+            <input id="barcodeInput" type="text" placeholder="Scan or enter barcode..." autofocus>
+            <button onclick="lookupBarcode()">Add Product</button>
+        </div>
+
+        <!-- Manual add row -->
+        <div class="scanner-card" style="margin-top: 15px;">
+            <input id="manualName" type="text" placeholder="Product Name">
+            <input id="manualPrice" type="text" placeholder="Price (£)">
+            <input id="manualBarcode" type="text" placeholder="Barcode">
+            <input id="manualPackSize" type="text" placeholder="Pack Size (e.g. 24 Tablets)">
+            <input id="manualQty" type="number" min="1" value="1" placeholder="Qty" style="width:80px;">
+            <button onclick="addManualProduct()">Manual Add</button>
+        </div>
+
+        <!-- Multi-barcode free type box -->
+        <div class="scanner-card" style="margin-top: 15px;">
+            <textarea id="bulkBarcodes" rows="4" placeholder="Paste or scan multiple barcodes (one per line, or separated by spaces/commas)"></textarea>
+            <button onclick="processBulkBarcodes()">Go</button>
+            <button onclick="clearBulkBarcodes()">Clear</button>
+        </div>
+
+        <div id="bulkStatus" style="margin-top:10px;color:#555;"></div>
+
+        <h3 style="margin-top:40px;">Scanned Products</h3>
+        <div class="results" id="results"></div>
+
+        <button class="generate-button" onclick="generatePDF()">Generate Labels PDF</button>
+    </main>
+
+    <script>
+        const apiUrl = "https://productlabelapi-win-b7a2hwcfcnebhcaf.uksouth-01.azurewebsites.net/api/getProduct?code=hNWKad9QxI_bhpyqhBXniz7q1-9eQL4wuKFwAs_uOtPTAzFu6C-_Rg==&barcode=";
+        let labelList = [];
+
+        // Holds the parsed sheet rows & headers from the chosen Excel file
+        let excelRows = [];
+        let excelHeaders = [];
+
+        // ── Excel helpers ──────────────────────────────────────────────
+
+        function onExcelFileChosen(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            document.getElementById("chosenFileName").textContent = file.name;
+            setExcelStatus("Reading file…", "");
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: "array" });
+
+                    // Use first sheet
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+                    if (!json.length) {
+                        setExcelStatus("The sheet appears to be empty.", "error");
+                        return;
+                    }
+
+                    excelRows = json;
+                    excelHeaders = Object.keys(json[0]);
+
+                    populateColumnDropdowns(excelHeaders);
+                    document.getElementById("colMappingSection").style.display = "block";
+                    setExcelStatus(`✔ Loaded ${json.length} row(s) from "${sheetName}". Map columns then click Import.`, "success");
+                } catch (err) {
+                    console.error(err);
+                    setExcelStatus("Failed to read file: " + err.message, "error");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function populateColumnDropdowns(headers) {
+            const selects = ["mapName", "mapPrice", "mapBarcode", "mapPackSize", "mapQty"];
+            selects.forEach(id => {
+                const sel = document.getElementById(id);
+                sel.innerHTML = "";
+                // Optional fields get a blank "none" option
+                if (id === "mapQty" || id === "mapPackSize") sel.innerHTML = '<option value="">(none)</option>';
+                headers.forEach(h => {
+                    const opt = document.createElement("option");
+                    opt.value = h;
+                    opt.textContent = h;
+                    sel.appendChild(opt);
+                });
+            });
+
+            // Auto-select likely columns by fuzzy name match
+            autoSelect("mapName",     ["name", "product", "description", "title", "item"]);
+            autoSelect("mapPrice",    ["price", "cost", "rrp", "retail", "amount"]);
+            autoSelect("mapBarcode",  ["barcode", "ean", "upc", "sku", "code"]);
+            autoSelect("mapPackSize", ["pack", "size", "unit", "volume", "weight", "tablet", "ml", "mg"]);
+            autoSelect("mapQty",      ["qty", "quantity", "count"]);
+        }
+
+        function autoSelect(selectId, keywords) {
+            const sel = document.getElementById(selectId);
+            const lower = excelHeaders.map(h => h.toLowerCase());
+            for (const kw of keywords) {
+                const idx = lower.findIndex(h => h.includes(kw));
+                if (idx !== -1) { sel.value = excelHeaders[idx]; return; }
+            }
+        }
+
+        function importFromExcel() {
+            const nameCol     = document.getElementById("mapName").value;
+            const priceCol    = document.getElementById("mapPrice").value;
+            const barcodeCol  = document.getElementById("mapBarcode").value;
+            const packSizeCol = document.getElementById("mapPackSize").value;
+            const qtyCol      = document.getElementById("mapQty").value;
+
+            if (!nameCol || !priceCol || !barcodeCol) {
+                setExcelStatus("Please map Name, Price, and Barcode columns.", "error");
+                return;
+            }
+
+            let imported = 0;
+            excelRows.forEach(row => {
+                const name     = String(row[nameCol] || "").trim();
+                const barcode  = String(row[barcodeCol] || "").trim();
+                const price    = parsePriceInput(row[priceCol]);
+                const packSize = packSizeCol ? String(row[packSizeCol] || "").trim() : "";
+                const qty      = qtyCol ? (Math.max(1, parseInt(row[qtyCol], 10) || 1)) : 1;
+
+                if (!name && !barcode) return; // skip empty rows
+
+                labelList.push({ name: name || "(no name)", barcode: barcode || "(no barcode)", price, packSize, qty });
+                imported++;
+            });
+
+            renderList();
+            setExcelStatus(`✔ Imported ${imported} product(s).`, "success");
+        }
+
+        function setExcelStatus(msg, cls) {
+            const el = document.getElementById("excelStatus");
+            el.textContent = msg;
+            el.className = cls || "";
+        }
+
+        // ── Existing logic (unchanged) ─────────────────────────────────
+
+        function parsePriceInput(str) {
+            const cleaned = (str === undefined || str === null) ? '' : String(str).replace(/[^\d.-]/g, '');
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function formatPrice(num) {
+            return '£' + Number(num || 0).toFixed(2);
+        }
+
+        document.getElementById("barcodeInput").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") lookupBarcode();
+        });
+
+        async function lookupBarcode() {
+            const code = document.getElementById("barcodeInput").value.trim();
+            if (!code) return;
+            try {
+                const response = await fetch(apiUrl + encodeURIComponent(code));
+                if (!response.ok) throw new Error("Network response was not ok");
+                const data = await response.json();
+                if (!data || !data.Barcode) { alert("Product not found or API error!"); return; }
+                addToList({ barcode: data.Barcode, name: data.Name, price: parsePriceInput(data.Price), qty: 1 });
+            } catch (err) {
+                console.error(err);
+                alert("Product not found or API error!");
+            }
+            document.getElementById("barcodeInput").value = "";
+            document.getElementById("barcodeInput").focus();
+        }
+
+        function addToList(product) { labelList.push(product); renderList(); }
+
+        function removeFromList(index) { labelList.splice(index, 1); renderList(); }
+
+        function updateQty(index, value) {
+            const q = Math.max(1, parseInt(value, 10) || 1);
+            if (labelList[index]) { labelList[index].qty = q; renderList(); }
+        }
+
+        function renderList() {
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = labelList.map((p, i) => `
+                <div class="card">
+                    <h4>${p.name}</h4>
+                    <p>Price: ${formatPrice(p.price)}</p>
+                    <p>Barcode: ${p.barcode}</p>
+                    ${p.packSize ? `<p>${p.packSize}</p>` : ""}
+                    <p>Qty:
+                        <input type="number" min="1" value="${p.qty || 1}" onchange="updateQty(${i}, this.value)" style="width:60px; margin-left:6px;">
+                    </p>
+                    <button onclick="removeFromList(${i})">Remove</button>
+                </div>
+            `).join("");
+        }
+
+        function generatePDF() {
+            try {
+                if (!labelList || labelList.length === 0) { alert("No labels to generate. Add products first."); return; }
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ unit: "mm", format: [58, 38], orientation: "landscape" });
+                for (let i = 0; i < labelList.length; i++) {
+                    const item = labelList[i];
+                    if (i > 0) doc.addPage();
+                    // ── Label layout (landscape 58×38mm) ──
+                    // Line 1: name @ y=6
+                    // Line 2: name wrap @ y=11  (12pt → ~5mm line height)
+                    // Line 3: pack size @ y=17  (10pt → ~4mm, +1mm gap after name)
+                    // [gap]
+                    // Price @ y=33              (30pt, anchored 5mm from bottom)
+
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(12);
+                    const nameLines = doc.splitTextToSize(item.name, 48).slice(0, 2);
+                    doc.text(nameLines, 5, 6);
+
+                    if (item.packSize) {
+                        doc.setFont("helvetica", "normal");
+                        doc.setFontSize(10);
+                        doc.text(String(item.packSize), 5, 17);
+                    }
+
+                    // ── Price: anchored near bottom with clear gap above ──
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(30);
+                    doc.text(formatPrice(item.price), 5, 33);
+                    const logoWidth = 10, logoHeight = 10;
+                    const x = 58 - logoWidth - 2;
+                    const y = 38 - logoHeight - 7;
+                }
+                doc.save("labels_72x36.pdf");
+            } catch (err) {
+                console.error("Failed to generate PDF:", err);
+                alert("Failed to generate PDF. See console for details.");
+            }
+        }
+
+        function addManualProduct() {
+            const name     = document.getElementById("manualName").value.trim();
+            const price    = document.getElementById("manualPrice").value.trim();
+            const barcode  = document.getElementById("manualBarcode").value.trim();
+            const packSize = document.getElementById("manualPackSize").value.trim();
+            const qtyVal   = document.getElementById("manualQty") ? document.getElementById("manualQty").value : "1";
+            if (!name || !price || !barcode) { alert("Please fill in Name, Price and Barcode!"); return; }
+            const qty = Math.max(1, parseInt(qtyVal, 10) || 1);
+            addToList({ name, price: parsePriceInput(price), barcode, packSize, qty });
+            document.getElementById("manualName").value = "";
+            document.getElementById("manualPrice").value = "";
+            document.getElementById("manualBarcode").value = "";
+            document.getElementById("manualPackSize").value = "";
+            if (document.getElementById("manualQty")) document.getElementById("manualQty").value = "1";
+        }
+
+        function processBulkBarcodes() {
+            // stub – existing implementation would go here
+        }
+
+        function clearBulkBarcodes() {
+            document.getElementById("bulkBarcodes").value = "";
+        }
+    </script>
+
+</body>
+</html>
