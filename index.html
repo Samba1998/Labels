@@ -67,61 +67,42 @@
         #excelStatus.error   { color: #b00; }
 
         /* ── product cards ── */
-        .results { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 14px; }
+        .results { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 14px; }
 
         .card { background: white; padding: 14px 16px 46px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.06); position: relative; transition: transform 0.15s, box-shadow 0.15s; }
         .card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.1); }
 
-        /* editable field wrapper */
-        .editable {
-            display: inline-block;
-            border-radius: 5px;
-            padding: 1px 4px;
-            margin: 1px -4px;
-            cursor: text;
-            transition: background 0.15s;
-            max-width: 100%;
-            word-break: break-word;
-        }
+        /* editable spans */
+        .editable { display: inline-block; border-radius: 5px; padding: 1px 4px; margin: 1px -4px; cursor: text; transition: background 0.15s; max-width: 100%; word-break: break-word; }
         .editable:hover { background: #f0f4ff; }
         .editable:hover::after { content: " ✎"; font-size: 0.75em; color: rgb(40,51,130); opacity: 0.6; }
 
-        .card h4 { margin: 0 0 6px; font-size: 1em; color: rgb(40,51,130); line-height: 1.3; }
-        .card h4 .editable { color: rgb(40,51,130); font-weight: bold; font-size: 1em; }
-
-        .card p  { margin: 3px 0; font-size: 0.83em; color: #555; }
+        .card h4 { margin: 0 0 7px; font-size: 1em; color: rgb(40,51,130); line-height: 1.3; }
+        .card h4 .editable { color: rgb(40,51,130); font-weight: bold; }
+        .card p  { margin: 3px 0; font-size: 0.83em; color: #555; line-height: 1.4; }
         .card p .editable { font-size: 1em; color: #555; }
 
-        /* inline edit input */
-        .inline-input {
-            border: 2px solid rgb(239,118,39);
-            border-radius: 6px;
-            padding: 2px 6px;
-            font-size: inherit;
-            font-family: inherit;
-            color: inherit;
-            background: #fffbf7;
-            outline: none;
-            width: 100%;
-        }
+        /* barcode list on card */
+        .barcode-list { margin: 4px 0 2px; }
+        .barcode-chip { display: inline-block; background: #f0f2f5; border-radius: 5px; padding: 2px 7px; margin: 2px 3px 2px 0; font-size: 0.78em; font-family: monospace; color: #444; }
 
-        .card .edit-hint { font-size: 0.7em; color: #bbb; margin-top: 6px; display: block; }
+        .inline-input { border: 2px solid rgb(239,118,39); border-radius: 6px; padding: 2px 6px; font-size: inherit; font-family: inherit; color: inherit; background: #fffbf7; outline: none; width: 100%; }
 
+        .card .edit-hint { font-size: 0.69em; color: #ccc; margin-top: 7px; display: block; }
         .card .card-remove { position: absolute; bottom: 10px; right: 10px; background: rgb(239,118,39); border: none; color: white; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.78em; transition: background 0.2s; }
         .card .card-remove:hover { background: rgb(187,103,48); }
 
-        /* qty control */
-        .qty-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 0.83em; color: #555; }
+        .qty-row { display: flex; align-items: center; gap: 6px; margin-top: 7px; font-size: 0.83em; color: #555; }
         .qty-row input { width: 55px; padding: 3px 6px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.95em; }
 
         /* action bar */
         .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e0e0e0; padding: 12px 30px; display: flex; align-items: center; gap: 12px; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.07); }
         .action-bar .product-count { flex: 1; font-size: 0.88em; color: #888; }
         .action-bar button { padding: 13px 24px; border: none; border-radius: 10px; font-size: 0.95em; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-        .btn-log       { background: rgb(40,51,130); color: white; }
+        .btn-log { background: rgb(40,51,130); color: white; }
         .btn-log:hover { background: rgb(60,75,180); }
         .btn-log:disabled, .btn-pdf:disabled { background: #ccc; cursor: not-allowed; }
-        .btn-pdf       { background: #FF9800; color: white; }
+        .btn-pdf { background: #FF9800; color: white; }
         .btn-pdf:hover { background: #F57C00; }
 
         .bottom-spacer { height: 70px; }
@@ -137,7 +118,6 @@
 
 <div class="page-body">
 
-  <!-- ═══════════ MAIN COLUMN ═══════════ -->
   <div class="main-col">
 
     <!-- EXCEL IMPORT -->
@@ -166,7 +146,7 @@
       <div id="excelStatus"></div>
     </div>
 
-    <!-- BARCODE / PIP LOOKUP -->
+    <!-- LOOKUP -->
     <div class="section-label">🔍 Barcode / PIP Lookup</div>
     <div class="scanner-card">
       <input id="barcodeInput" type="text" placeholder="Scan or type barcode / PIP code…" autofocus>
@@ -179,7 +159,7 @@
     <div class="scanner-card">
       <input id="manualName"     type="text"   placeholder="Product Name">
       <input id="manualPrice"    type="text"   placeholder="Price (£)">
-      <input id="manualBarcode"  type="text"   placeholder="Barcode">
+      <input id="manualBarcode"  type="text"   placeholder="Barcode(s) — comma separated">
       <input id="manualPIP"      type="text"   placeholder="PIP Code">
       <input id="manualPackSize" type="text"   placeholder="Pack Size">
       <input id="manualQty"      type="number" min="1" value="1" style="width:75px;">
@@ -197,14 +177,13 @@
     </div>
     <div id="bulkStatus"></div>
 
-    <!-- PRODUCT LIST -->
     <h3 style="margin-top:28px;margin-bottom:0;">Queued Products</h3>
     <div class="results" id="results"></div>
     <div class="bottom-spacer"></div>
 
   </div><!-- /main-col -->
 
-  <!-- ═══════════ UNMATCHED SIDEBAR ═══════════ -->
+  <!-- UNMATCHED SIDEBAR -->
   <div class="unmatched-panel">
     <h3>⚠️ Unmatched <span class="badge" id="unmatchedBadge">0</span></h3>
     <div class="unmatched-list" id="unmatchedList">
@@ -215,9 +194,9 @@
     </div>
   </div>
 
-</div><!-- /page-body -->
+</div>
 
-<!-- BOTTOM ACTION BAR -->
+<!-- ACTION BAR -->
 <div class="action-bar">
   <div class="product-count" id="productCount">No products queued.</div>
   <button class="btn-log" id="btnLog" onclick="downloadSessionLog()" disabled>⬇ Session Log</button>
@@ -226,27 +205,27 @@
 
 <script>
 // ─────────────────────────────────────────────────────────────────────────────
-//  ⚙️  CONFIGURATION — replace with your own raw GitHub URL
+//  ⚙️  Replace with your raw GitHub URL for products.csv
 //  e.g. https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/products.csv
 // ─────────────────────────────────────────────────────────────────────────────
-const PRODUCTS_CSV_URL = "https://raw.githubusercontent.com/Samba1998/Labels/main/products.csv";
+const PRODUCTS_CSV_URL = "https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/products.csv";
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let labelList      = [];
-let productDB      = [];
+let productDB      = [];      // raw rows from CSV
 let unmatchedCodes = [];
 let sessionLog     = [];
 let excelRows      = [];
 let excelHeaders   = [];
 
-// ─── LOAD PRODUCTS CSV ────────────────────────────────────────────────────────
+// ─── LOAD PRODUCTS CSV ───────────────────────────────────────────────────────
 async function loadProductsCSV() {
     setDbStatus("", "⏳ Loading database…");
     try {
         const resp = await fetch(PRODUCTS_CSV_URL + "?t=" + Date.now());
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         productDB = parseCSVToObjects(await resp.text());
-        setDbStatus("ok", `✔ ${productDB.length} products loaded`);
+        setDbStatus("ok", `✔ ${productDB.length} rows loaded`);
     } catch (err) {
         setDbStatus("err", `✖ Could not load products.csv — ${err.message}`);
     }
@@ -256,42 +235,97 @@ function setDbStatus(cls, msg) {
     el.textContent = msg; el.className = "db-status " + cls;
 }
 
-// ─── LOOKUP ───────────────────────────────────────────────────────────────────
+// ─── LOOKUP HELPERS ──────────────────────────────────────────────────────────
 function detectCodeType(code) {
     if (/^\d{7}$/.test(code))    return "pip";
     if (/^\d{8,13}$/.test(code)) return "barcode";
     return "both";
 }
-function findProduct(code) {
-    if (!productDB.length) return null;
-    const norm = v => String(v || "").trim().toLowerCase();
-    const type = detectCodeType(code);
-    for (const row of productDB) {
-        if ((type === "pip"     || type === "both") && norm(row.PIP)     === norm(code)) return row;
-        if ((type === "barcode" || type === "both") && norm(row.Barcode) === norm(code)) return row;
-    }
-    return null;
-}
-function rowToLabel(row, qty) {
+
+// Returns a single merged label object for a PIP code
+// (collects all rows sharing that PIP and unions their barcodes)
+function findByPIP(pip) {
+    const norm  = v => String(v || "").trim().toLowerCase();
+    const rows  = productDB.filter(r => norm(r.PIP) === norm(pip));
+    if (!rows.length) return null;
+
+    // Use first row for name/price/packSize, union all barcodes
+    const base     = rows[0];
+    const barcodes = [...new Set(
+        rows.map(r => String(r.Barcode || "").trim()).filter(Boolean)
+    )];
+
     return {
-        name:     String(row.Name || "").trim(),
-        price:    parsePriceInput(row.Price),
-        barcode:  String(row.Barcode || "").trim(),
-        pip:      String(row.PIP || "").trim(),
-        packSize: String(row["Pack Size"] || "").trim(),
-        qty:      qty || 1
+        name:     String(base.Name          || "").trim(),
+        price:    parsePriceInput(base.Price),
+        pip:      String(base.PIP           || "").trim(),
+        packSize: String(base["Pack Size"]  || "").trim(),
+        barcodes,   // array
+        qty: 1
     };
 }
 
-// ─── SINGLE LOOKUP ────────────────────────────────────────────────────────────
+// Returns a single label object for a barcode
+function findByBarcode(barcode) {
+    const norm = v => String(v || "").trim().toLowerCase();
+    const row  = productDB.find(r => norm(r.Barcode) === norm(barcode));
+    if (!row) return null;
+
+    // If this row has a PIP, collect all sibling barcodes too
+    const pip      = String(row.PIP || "").trim();
+    const barcodes = pip
+        ? [...new Set(
+            productDB
+                .filter(r => String(r.PIP || "").trim().toLowerCase() === pip.toLowerCase())
+                .map(r => String(r.Barcode || "").trim()).filter(Boolean)
+          )]
+        : [String(row.Barcode || "").trim()].filter(Boolean);
+
+    return {
+        name:     String(row.Name         || "").trim(),
+        price:    parsePriceInput(row.Price),
+        pip:      pip,
+        packSize: String(row["Pack Size"] || "").trim(),
+        barcodes,
+        qty: 1
+    };
+}
+
+function findProduct(code) {
+    if (!productDB.length) return null;
+    const type = detectCodeType(code);
+    if (type === "pip")     return findByPIP(code);
+    if (type === "barcode") return findByBarcode(code);
+    // "both" — try PIP first, then barcode
+    return findByPIP(code) || findByBarcode(code);
+}
+
+// ─── DUPLICATE CHECK ─────────────────────────────────────────────────────────
+// A product is already queued if its PIP matches (when present),
+// or if any of its barcodes overlap with a queued item.
+function alreadyQueued(label) {
+    return labelList.some(existing => {
+        if (label.pip && existing.pip && label.pip === existing.pip) return true;
+        if (label.barcodes && existing.barcodes)
+            return label.barcodes.some(b => existing.barcodes.includes(b));
+        return false;
+    });
+}
+
+// ─── SINGLE LOOKUP ───────────────────────────────────────────────────────────
 function lookupSingle() {
     const code = document.getElementById("barcodeInput").value.trim();
     if (!code) return;
     if (!productDB.length) { showToast("Product database not loaded yet.", "crimson"); return; }
-    const row = findProduct(code);
-    if (row) {
-        labelList.push(rowToLabel(row, 1));
-        renderList();
+
+    const label = findProduct(code);
+    if (label) {
+        if (alreadyQueued(label)) {
+            showToast(`"${label.name}" is already in the queue.`, "steelblue");
+        } else {
+            labelList.push(label);
+            renderList();
+        }
     } else {
         const isPIP = detectCodeType(code) === "pip";
         document.getElementById(isPIP ? "manualPIP" : "manualBarcode").value = code;
@@ -299,42 +333,56 @@ function lookupSingle() {
         document.getElementById("manualName").focus();
         showToast(`"${code}" not found — fill in details below.`, "darkorange");
     }
+
     document.getElementById("barcodeInput").value = "";
     document.getElementById("barcodeInput").focus();
 }
 document.getElementById("barcodeInput").addEventListener("keypress", e => { if (e.key === "Enter") lookupSingle(); });
 
-// ─── BULK BARCODES ────────────────────────────────────────────────────────────
+// ─── BULK BARCODES ───────────────────────────────────────────────────────────
 function processBulkBarcodes() {
-    const codes = document.getElementById("bulkBarcodes").value
-        .split(/[\n,\s]+/).map(s => s.trim()).filter(Boolean);
+    const raw = document.getElementById("bulkBarcodes").value;
+    // Split on newlines, commas, or spaces — but be careful not to break
+    // comma-separated values inside a line. We treat each line separately first.
+    const codes = raw.split(/[\n]+/)
+        .flatMap(line => line.split(/[,\s]+/))
+        .map(s => s.trim()).filter(Boolean);
+
     if (!codes.length) return;
     if (!productDB.length) { showToast("Product database not loaded yet.", "crimson"); return; }
-    let matched = 0, newUnmatched = [];
+
+    let matched = 0, skipped = 0, newUnmatched = [];
+
     codes.forEach(code => {
-        const row = findProduct(code);
-        if (row) {
-            const label    = rowToLabel(row, 1);
-            const existing = labelList.find(l => l.barcode && l.barcode === label.barcode);
-            if (existing) existing.qty++;
-            else labelList.push(label);
-            matched++;
+        const label = findProduct(code);
+        if (label) {
+            if (alreadyQueued(label)) {
+                skipped++;
+            } else {
+                labelList.push(label);
+                matched++;
+            }
         } else {
             if (!unmatchedCodes.includes(code)) newUnmatched.push(code);
         }
     });
+
     unmatchedCodes = [...unmatchedCodes, ...newUnmatched];
     renderList();
     renderUnmatched();
-    document.getElementById("bulkStatus").textContent =
-        `✔ ${matched} matched · ${newUnmatched.length} new unmatched (${unmatchedCodes.length} total)`;
+
+    const parts = [`✔ ${matched} added`];
+    if (skipped)           parts.push(`${skipped} already queued`);
+    if (newUnmatched.length) parts.push(`${newUnmatched.length} unmatched`);
+    document.getElementById("bulkStatus").textContent = parts.join(" · ");
 }
+
 function clearBulkBarcodes() {
     document.getElementById("bulkBarcodes").value = "";
     document.getElementById("bulkStatus").textContent = "";
 }
 
-// ─── UNMATCHED ────────────────────────────────────────────────────────────────
+// ─── UNMATCHED ───────────────────────────────────────────────────────────────
 function renderUnmatched() {
     document.getElementById("unmatchedBadge").textContent    = unmatchedCodes.length;
     document.getElementById("downloadUnmatchedBtn").disabled = !unmatchedCodes.length;
@@ -343,47 +391,57 @@ function renderUnmatched() {
         : '<div class="unmatched-empty">No unmatched codes yet.</div>';
 }
 function downloadUnmatched() {
-    if (!unmatchedCodes.length) return;
     triggerDownload("unmatched_codes.csv", "code\n" + unmatchedCodes.join("\n"));
 }
 
-// ─── MANUAL ADD ───────────────────────────────────────────────────────────────
+// ─── MANUAL ADD ──────────────────────────────────────────────────────────────
 function addManualProduct() {
     const name     = document.getElementById("manualName").value.trim();
     const price    = document.getElementById("manualPrice").value.trim();
-    const barcode  = document.getElementById("manualBarcode").value.trim();
+    const barcodesRaw = document.getElementById("manualBarcode").value.trim();
     const pip      = document.getElementById("manualPIP").value.trim();
     const packSize = document.getElementById("manualPackSize").value.trim();
     const qty      = Math.max(1, parseInt(document.getElementById("manualQty").value, 10) || 1);
+
     if (!name || !price) { showToast("Name and Price are required.", "crimson"); return; }
-    labelList.push({ name, price: parsePriceInput(price), barcode, pip, packSize, qty });
+
+    const barcodes = barcodesRaw ? barcodesRaw.split(",").map(s => s.trim()).filter(Boolean) : [];
+
+    labelList.push({ name, price: parsePriceInput(price), barcodes, pip, packSize, qty });
     renderList();
     ["manualName","manualPrice","manualBarcode","manualPIP","manualPackSize"].forEach(id =>
         document.getElementById(id).value = "");
     document.getElementById("manualQty").value = "1";
 }
 
-// ─── RENDER LABEL LIST ────────────────────────────────────────────────────────
+// ─── RENDER ──────────────────────────────────────────────────────────────────
 function renderList() {
-    const total = labelList.reduce((s,p) => s + (p.qty||1), 0);
+    const total = labelList.reduce((s, p) => s + (p.qty || 1), 0);
 
-    document.getElementById("results").innerHTML = labelList.map((p, i) => `
+    document.getElementById("results").innerHTML = labelList.map((p, i) => {
+        const barcodeHtml = p.barcodes && p.barcodes.length
+            ? `<div class="barcode-list">${p.barcodes.map(b =>
+                `<span class="barcode-chip">🔢 ${escHtml(b)}</span>`).join("")}</div>`
+            : "";
+
+        return `
         <div class="card" id="card-${i}">
             <h4>
-                <span class="editable" onclick="startEdit(${i},'name',this)" title="Click to edit name">
+                <span class="editable" onclick="startEdit(${i},'name',this)" title="Click to edit">
                     ${escHtml(p.name) || '<em style="color:#bbb">No name</em>'}
                 </span>
             </h4>
-            <p>💷 <span class="editable" onclick="startEdit(${i},'price',this)" title="Click to edit price">${formatPrice(p.price)}</span></p>
-            ${p.barcode  ? `<p>🔢 ${escHtml(p.barcode)}</p>`  : ""}
-            ${p.pip      ? `<p>💊 PIP: ${escHtml(p.pip)}</p>` : ""}
-            <p>📦 <span class="editable" onclick="startEdit(${i},'packSize',this)" title="Click to edit pack size">${escHtml(p.packSize) || '<em style="color:#bbb">No pack size</em>'}</span></p>
+            <p>💷 <span class="editable" onclick="startEdit(${i},'price',this)" title="Click to edit">${formatPrice(p.price)}</span></p>
+            ${p.pip ? `<p>💊 PIP: ${escHtml(p.pip)}</p>` : ""}
+            ${barcodeHtml}
+            <p>📦 <span class="editable" onclick="startEdit(${i},'packSize',this)" title="Click to edit">${escHtml(p.packSize) || '<em style="color:#bbb">No pack size</em>'}</span></p>
             <div class="qty-row">
                 Qty: <input type="number" min="1" value="${p.qty||1}" onchange="updateQty(${i},this.value)">
             </div>
             <span class="edit-hint">Click name, price or pack size to edit</span>
             <button class="card-remove" onclick="removeFromList(${i})">Remove</button>
-        </div>`).join("");
+        </div>`;
+    }).join("");
 
     const hasItems = labelList.length > 0;
     document.getElementById("btnPdf").disabled = !hasItems;
@@ -396,46 +454,35 @@ function renderList() {
 function removeFromList(i) { labelList.splice(i, 1); renderList(); }
 function updateQty(i, val) { if (labelList[i]) { labelList[i].qty = Math.max(1, parseInt(val,10)||1); renderList(); } }
 
-// ─── INLINE EDITING ───────────────────────────────────────────────────────────
+// ─── INLINE EDITING ──────────────────────────────────────────────────────────
 function startEdit(idx, field, spanEl) {
-    // Already editing this field — ignore
     if (spanEl.querySelector("input")) return;
-
     const current = field === "price"
         ? Number(labelList[idx].price || 0).toFixed(2)
         : (labelList[idx][field] || "");
 
     const input = document.createElement("input");
-    input.className   = "inline-input";
-    input.type        = field === "price" ? "number" : "text";
-    input.step        = field === "price" ? "0.01" : undefined;
-    input.min         = field === "price" ? "0"    : undefined;
-    input.value       = current;
-
-    // Replace span content with input
+    input.className = "inline-input";
+    input.type  = field === "price" ? "number" : "text";
+    if (field === "price") { input.step = "0.01"; input.min = "0"; }
+    input.value = current;
     spanEl.innerHTML = "";
     spanEl.appendChild(input);
-    input.focus();
-    input.select();
+    input.focus(); input.select();
 
     const commit = () => {
         const raw = input.value.trim();
-        if (field === "price") {
-            labelList[idx].price = parsePriceInput(raw);
-        } else {
-            labelList[idx][field] = raw;
-        }
+        labelList[idx][field] = field === "price" ? parsePriceInput(raw) : raw;
         renderList();
     };
-
-    input.addEventListener("blur",  commit);
+    input.addEventListener("blur", commit);
     input.addEventListener("keydown", e => {
-        if (e.key === "Enter")  { input.blur(); }
-        if (e.key === "Escape") { renderList(); } // cancel
+        if (e.key === "Enter")  input.blur();
+        if (e.key === "Escape") renderList();
     });
 }
 
-// ─── EXCEL IMPORT ─────────────────────────────────────────────────────────────
+// ─── EXCEL IMPORT ────────────────────────────────────────────────────────────
 function onExcelFileChosen(input) {
     const file = input.files[0]; if (!file) return;
     document.getElementById("chosenFileName").textContent = file.name;
@@ -446,8 +493,7 @@ function onExcelFileChosen(input) {
             const wb   = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
             const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
             if (!json.length) { setExcelStatus("Sheet appears empty.", "error"); return; }
-            excelRows    = json;
-            excelHeaders = Object.keys(json[0]);
+            excelRows = json; excelHeaders = Object.keys(json[0]);
             populateColumnDropdowns(excelHeaders);
             document.getElementById("colMappingSection").style.display = "block";
             setExcelStatus(`✔ Loaded ${json.length} row(s). Map columns then click Import.`, "success");
@@ -459,7 +505,7 @@ function populateColumnDropdowns(headers) {
     ["mapName","mapPrice","mapBarcode","mapPackSize","mapPIP","mapQty"].forEach(id => {
         const sel = document.getElementById(id);
         sel.innerHTML = ["mapQty","mapPackSize","mapPIP"].includes(id) ? '<option value="">(none)</option>' : "";
-        headers.forEach(h => { const o = document.createElement("option"); o.value = h; o.textContent = h; sel.appendChild(o); });
+        headers.forEach(h => { const o = document.createElement("option"); o.value=h; o.textContent=h; sel.appendChild(o); });
     });
     autoSelect("mapName",     ["name","product","description","title","item"]);
     autoSelect("mapPrice",    ["price","cost","rrp","retail","amount"]);
@@ -477,36 +523,66 @@ function autoSelect(id, keywords) {
     }
 }
 function importFromExcel() {
-    const nc = document.getElementById("mapName").value;
-    const pc = document.getElementById("mapPrice").value;
-    const bc = document.getElementById("mapBarcode").value;
-    const sc = document.getElementById("mapPackSize").value;
-    const ic = document.getElementById("mapPIP").value;
-    const qc = document.getElementById("mapQty").value;
-    if (!nc || !pc || !bc) { setExcelStatus("Map Name, Price and Barcode first.", "error"); return; }
-    let n = 0;
+    const nc=document.getElementById("mapName").value, pc=document.getElementById("mapPrice").value,
+          bc=document.getElementById("mapBarcode").value, sc=document.getElementById("mapPackSize").value,
+          ic=document.getElementById("mapPIP").value,    qc=document.getElementById("mapQty").value;
+    if (!nc||!pc||!bc) { setExcelStatus("Map Name, Price and Barcode first.", "error"); return; }
+
+    // Group rows by PIP where possible, otherwise treat each row individually
+    const pipGroups = {};
+    const noPIPRows = [];
+
     excelRows.forEach(row => {
-        const name = String(row[nc] || "").trim();
-        const barcode = String(row[bc] || "").trim();
-        if (!name && !barcode) return;
+        const pip = ic ? String(row[ic]||"").trim() : "";
+        if (pip) {
+            if (!pipGroups[pip]) pipGroups[pip] = [];
+            pipGroups[pip].push(row);
+        } else {
+            noPIPRows.push(row);
+        }
+    });
+
+    let n = 0;
+
+    // Add one label per PIP group
+    Object.entries(pipGroups).forEach(([pip, rows]) => {
+        const base     = rows[0];
+        const barcodes = [...new Set(rows.map(r => String(r[bc]||"").trim()).filter(Boolean))];
+        const name     = String(base[nc]||"").trim();
+        if (!name && !barcodes.length) return;
         labelList.push({
-            name: name || "(no name)", barcode: barcode || "",
-            price: parsePriceInput(row[pc]),
-            packSize: sc ? String(row[sc] || "").trim() : "",
-            pip:      ic ? String(row[ic] || "").trim() : "",
-            qty:      qc ? Math.max(1, parseInt(row[qc], 10) || 1) : 1
+            name:     name || "(no name)",
+            price:    parsePriceInput(base[pc]),
+            barcodes,
+            pip,
+            packSize: sc ? String(base[sc]||"").trim() : "",
+            qty:      qc ? Math.max(1, parseInt(base[qc],10)||1) : 1
         });
         n++;
     });
+
+    // Rows without a PIP — one label per row
+    noPIPRows.forEach(row => {
+        const name    = String(row[nc]||"").trim();
+        const barcode = String(row[bc]||"").trim();
+        if (!name && !barcode) return;
+        labelList.push({
+            name:     name || "(no name)",
+            price:    parsePriceInput(row[pc]),
+            barcodes: barcode ? [barcode] : [],
+            pip:      "",
+            packSize: sc ? String(row[sc]||"").trim() : "",
+            qty:      qc ? Math.max(1, parseInt(row[qc],10)||1) : 1
+        });
+        n++;
+    });
+
     renderList();
     setExcelStatus(`✔ Imported ${n} product(s).`, "success");
 }
-function setExcelStatus(msg, cls) {
-    const el = document.getElementById("excelStatus");
-    el.textContent = msg; el.className = cls || "";
-}
+function setExcelStatus(msg, cls) { const el=document.getElementById("excelStatus"); el.textContent=msg; el.className=cls||""; }
 
-// ─── GENERATE PDF ─────────────────────────────────────────────────────────────
+// ─── GENERATE PDF ────────────────────────────────────────────────────────────
 async function generatePDF() {
     if (!labelList.length) return;
     try {
@@ -517,7 +593,7 @@ async function generatePDF() {
             for (let c = 0; c < (item.qty||1); c++) {
                 if (!first) doc.addPage(); first = false;
                 doc.setFont("helvetica","normal"); doc.setFontSize(12);
-                doc.text(doc.splitTextToSize(item.name, 48).slice(0,2), 5, 6);
+                doc.text(doc.splitTextToSize(item.name,48).slice(0,2), 5, 6);
                 if (item.packSize) {
                     doc.setFont("helvetica","normal"); doc.setFontSize(10);
                     doc.text(String(item.packSize), 5, 17);
@@ -530,27 +606,25 @@ async function generatePDF() {
         sessionLog.push({
             timestamp:   new Date().toLocaleString("en-GB"),
             products:    labelList.map(p => ({ ...p })),
-            totalLabels: labelList.reduce((s,p) => s + (p.qty||1), 0)
+            totalLabels: labelList.reduce((s,p) => s+(p.qty||1), 0)
         });
         document.getElementById("btnLog").disabled = false;
         showToast("PDF generated!", "rgb(40,51,130)");
-    } catch (err) {
-        console.error(err); showToast("PDF generation failed — see console.", "crimson");
-    }
+    } catch (err) { console.error(err); showToast("PDF generation failed.", "crimson"); }
 }
 
 // ─── SESSION LOG ─────────────────────────────────────────────────────────────
 function downloadSessionLog() {
     if (!sessionLog.length) return;
-    const rows = ["Timestamp,Product Name,Barcode,PIP,Pack Size,Price,Qty"];
+    const rows = ["Timestamp,Product Name,Barcodes,PIP,Pack Size,Price,Qty"];
     sessionLog.forEach(run => {
         run.products.forEach(p => {
             rows.push([
                 `"${run.timestamp}"`,
-                `"${(p.name     ||"").replace(/"/g,'""')}"`,
-                `"${(p.barcode  ||"").replace(/"/g,'""')}"`,
-                `"${(p.pip      ||"").replace(/"/g,'""')}"`,
-                `"${(p.packSize ||"").replace(/"/g,'""')}"`,
+                `"${(p.name||"").replace(/"/g,'""')}"`,
+                `"${(p.barcodes||[]).join("; ").replace(/"/g,'""')}"`,
+                `"${(p.pip||"").replace(/"/g,'""')}"`,
+                `"${(p.packSize||"").replace(/"/g,'""')}"`,
                 formatPrice(p.price),
                 p.qty||1
             ].join(","));
@@ -559,7 +633,7 @@ function downloadSessionLog() {
     triggerDownload(`label_session_${new Date().toISOString().slice(0,10)}.csv`, rows.join("\n"));
 }
 
-// ─── CSV PARSE ────────────────────────────────────────────────────────────────
+// ─── CSV PARSE ───────────────────────────────────────────────────────────────
 function parseCSVToObjects(text) {
     const lines = text.trim().split("\n");
     if (lines.length < 2) return [];
@@ -571,36 +645,36 @@ function parseCSVToObjects(text) {
     }).filter(row => Object.values(row).some(v => v));
 }
 function parseCSVLine(line) {
-    const result = []; let cur = "", inQ = false;
-    for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch==='"' && inQ && line[i+1]==='"') { cur+='"'; i++; }
-        else if (ch==='"') inQ = !inQ;
-        else if (ch===',' && !inQ) { result.push(cur); cur=""; }
-        else cur += ch;
+    const result=[]; let cur="", inQ=false;
+    for (let i=0; i<line.length; i++) {
+        const ch=line[i];
+        if (ch==='"'&&inQ&&line[i+1]==='"') { cur+='"'; i++; }
+        else if (ch==='"') inQ=!inQ;
+        else if (ch===','&&!inQ) { result.push(cur); cur=""; }
+        else cur+=ch;
     }
     result.push(cur); return result;
 }
 
 // ─── UTILS ───────────────────────────────────────────────────────────────────
-function parsePriceInput(str) { const n = parseFloat(String(str??"").replace(/[^\d.-]/g,"")); return isNaN(n)?0:n; }
-function formatPrice(num) { return "£" + Number(num||0).toFixed(2); }
+function parsePriceInput(str) { const n=parseFloat(String(str??"").replace(/[^\d.-]/g,"")); return isNaN(n)?0:n; }
+function formatPrice(num) { return "£"+Number(num||0).toFixed(2); }
 function escHtml(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function triggerDownload(filename, text) { const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text],{type:"text/csv"})); a.download = filename; a.click(); }
+function triggerDownload(filename, text) { const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:"text/csv"})); a.download=filename; a.click(); }
 
 let _tt;
 function showToast(msg, color) {
-    let t = document.getElementById("_toast");
+    let t=document.getElementById("_toast");
     if (!t) {
-        t = document.createElement("div"); t.id = "_toast";
-        Object.assign(t.style, { position:"fixed", bottom:"80px", right:"24px", color:"#fff", padding:"12px 18px", borderRadius:"10px", fontSize:"0.88em", fontWeight:"bold", boxShadow:"0 4px 14px rgba(0,0,0,0.22)", zIndex:"200", transition:"opacity 0.4s", opacity:"0", maxWidth:"320px", lineHeight:"1.4" });
+        t=document.createElement("div"); t.id="_toast";
+        Object.assign(t.style,{position:"fixed",bottom:"80px",right:"24px",color:"#fff",padding:"12px 18px",borderRadius:"10px",fontSize:"0.88em",fontWeight:"bold",boxShadow:"0 4px 14px rgba(0,0,0,0.22)",zIndex:"200",transition:"opacity 0.4s",opacity:"0",maxWidth:"320px",lineHeight:"1.4"});
         document.body.appendChild(t);
     }
-    t.style.background = color||"#333"; t.textContent = msg; t.style.opacity = "1";
-    clearTimeout(_tt); _tt = setTimeout(() => t.style.opacity = "0", 3800);
+    t.style.background=color||"#333"; t.textContent=msg; t.style.opacity="1";
+    clearTimeout(_tt); _tt=setTimeout(()=>t.style.opacity="0",3800);
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
+// ─── INIT ────────────────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded", () => {
     renderList();
     renderUnmatched();
