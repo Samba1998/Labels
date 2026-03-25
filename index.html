@@ -66,13 +66,11 @@
         #excelStatus.success { color: #2a7a2a; }
         #excelStatus.error   { color: #b00; }
 
-        /* ── product cards ── */
+        /* product cards */
         .results { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 14px; }
-
         .card { background: white; padding: 14px 16px 46px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.06); position: relative; transition: transform 0.15s, box-shadow 0.15s; }
         .card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.1); }
 
-        /* editable spans */
         .editable { display: inline-block; border-radius: 5px; padding: 1px 4px; margin: 1px -4px; cursor: text; transition: background 0.15s; max-width: 100%; word-break: break-word; }
         .editable:hover { background: #f0f4ff; }
         .editable:hover::after { content: " ✎"; font-size: 0.75em; color: rgb(40,51,130); opacity: 0.6; }
@@ -82,9 +80,9 @@
         .card p  { margin: 3px 0; font-size: 0.83em; color: #555; line-height: 1.4; }
         .card p .editable { font-size: 1em; color: #555; }
 
-        /* barcode list on card */
         .barcode-list { margin: 4px 0 2px; }
         .barcode-chip { display: inline-block; background: #f0f2f5; border-radius: 5px; padding: 2px 7px; margin: 2px 3px 2px 0; font-size: 0.78em; font-family: monospace; color: #444; }
+        .barcode-chip.primary { background: #e8eeff; color: rgb(40,51,130); font-weight: bold; }
 
         .inline-input { border: 2px solid rgb(239,118,39); border-radius: 6px; padding: 2px 6px; font-size: inherit; font-family: inherit; color: inherit; background: #fffbf7; outline: none; width: 100%; }
 
@@ -95,7 +93,6 @@
         .qty-row { display: flex; align-items: center; gap: 6px; margin-top: 7px; font-size: 0.83em; color: #555; }
         .qty-row input { width: 55px; padding: 3px 6px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.95em; }
 
-        /* action bar */
         .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e0e0e0; padding: 12px 30px; display: flex; align-items: center; gap: 12px; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.07); }
         .action-bar .product-count { flex: 1; font-size: 0.88em; color: #888; }
         .action-bar button { padding: 13px 24px; border: none; border-radius: 10px; font-size: 0.95em; font-weight: bold; cursor: pointer; transition: background 0.2s; }
@@ -117,7 +114,6 @@
 </header>
 
 <div class="page-body">
-
   <div class="main-col">
 
     <!-- EXCEL IMPORT -->
@@ -137,6 +133,7 @@
           <div class="map-field"><label>Name *</label><select id="mapName"></select></div>
           <div class="map-field"><label>Price *</label><select id="mapPrice"></select></div>
           <div class="map-field"><label>Barcode *</label><select id="mapBarcode"></select></div>
+          <div class="map-field"><label>Other Barcodes (opt)</label><select id="mapOtherBarcodes"></select></div>
           <div class="map-field"><label>Pack Size (opt)</label><select id="mapPackSize"></select></div>
           <div class="map-field"><label>PIP (opt)</label><select id="mapPIP"></select></div>
           <div class="map-field"><label>Qty (opt)</label><select id="mapQty"></select></div>
@@ -159,7 +156,8 @@
     <div class="scanner-card">
       <input id="manualName"     type="text"   placeholder="Product Name">
       <input id="manualPrice"    type="text"   placeholder="Price (£)">
-      <input id="manualBarcode"  type="text"   placeholder="Barcode(s) — comma separated">
+      <input id="manualBarcode"  type="text"   placeholder="Barcode">
+      <input id="manualOther"    type="text"   placeholder="Other Barcodes (comma separated)">
       <input id="manualPIP"      type="text"   placeholder="PIP Code">
       <input id="manualPackSize" type="text"   placeholder="Pack Size">
       <input id="manualQty"      type="number" min="1" value="1" style="width:75px;">
@@ -181,7 +179,7 @@
     <div class="results" id="results"></div>
     <div class="bottom-spacer"></div>
 
-  </div><!-- /main-col -->
+  </div>
 
   <!-- UNMATCHED SIDEBAR -->
   <div class="unmatched-panel">
@@ -193,10 +191,8 @@
       <button id="downloadUnmatchedBtn" onclick="downloadUnmatched()" disabled>⬇ Download CSV</button>
     </div>
   </div>
-
 </div>
 
-<!-- ACTION BAR -->
 <div class="action-bar">
   <div class="product-count" id="productCount">No products queued.</div>
   <button class="btn-log" id="btnLog" onclick="downloadSessionLog()" disabled>⬇ Session Log</button>
@@ -212,11 +208,19 @@ const PRODUCTS_CSV_URL = "https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-R
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let labelList      = [];
-let productDB      = [];      // raw rows from CSV
+let productDB      = [];
 let unmatchedCodes = [];
 let sessionLog     = [];
 let excelRows      = [];
 let excelHeaders   = [];
+
+// ─── CSV COLUMN NAMES (matching your exact headers) ──────────────────────────
+const COL_PIP            = "PIP";
+const COL_NAME           = "Name";
+const COL_PACK_SIZE      = "Pack Size";
+const COL_BARCODE        = "Barcode";
+const COL_PRICE          = "Price";
+const COL_OTHER_BARCODES = "Other Barcodes";
 
 // ─── LOAD PRODUCTS CSV ───────────────────────────────────────────────────────
 async function loadProductsCSV() {
@@ -235,80 +239,71 @@ function setDbStatus(cls, msg) {
     el.textContent = msg; el.className = "db-status " + cls;
 }
 
-// ─── LOOKUP HELPERS ──────────────────────────────────────────────────────────
+// ─── BARCODE EXTRACTION ──────────────────────────────────────────────────────
+// Returns all barcodes for a row: primary + any extras from "Other Barcodes"
+function extractBarcodes(row) {
+    const primary = String(row[COL_BARCODE] || "").trim();
+    const others  = String(row[COL_OTHER_BARCODES] || "")
+        .split(",").map(s => s.trim()).filter(Boolean);
+    return [...new Set([primary, ...others].filter(Boolean))];
+}
+
+// ─── BUILD LABEL FROM ROW(S) ─────────────────────────────────────────────────
+// Accepts one or more rows sharing the same PIP and merges their barcodes
+function buildLabel(rows, qty) {
+    const base     = rows[0];
+    const barcodes = [...new Set(rows.flatMap(r => extractBarcodes(r)))];
+    return {
+        name:          String(base[COL_NAME]      || "").trim(),
+        price:         parsePriceInput(base[COL_PRICE]),
+        pip:           String(base[COL_PIP]        || "").trim(),
+        packSize:      String(base[COL_PACK_SIZE]  || "").trim(),
+        primaryBarcode: String(base[COL_BARCODE]   || "").trim(),
+        barcodes,
+        qty: qty || 1
+    };
+}
+
+// ─── LOOKUP ──────────────────────────────────────────────────────────────────
 function detectCodeType(code) {
     if (/^\d{7}$/.test(code))    return "pip";
     if (/^\d{8,13}$/.test(code)) return "barcode";
     return "both";
 }
 
-// Returns a single merged label object for a PIP code
-// (collects all rows sharing that PIP and unions their barcodes)
-function findByPIP(pip) {
-    const norm  = v => String(v || "").trim().toLowerCase();
-    const rows  = productDB.filter(r => norm(r.PIP) === norm(pip));
-    if (!rows.length) return null;
-
-    // Use first row for name/price/packSize, union all barcodes
-    const base     = rows[0];
-    const barcodes = [...new Set(
-        rows.map(r => String(r.Barcode || "").trim()).filter(Boolean)
-    )];
-
-    return {
-        name:     String(base.Name          || "").trim(),
-        price:    parsePriceInput(base.Price),
-        pip:      String(base.PIP           || "").trim(),
-        packSize: String(base["Pack Size"]  || "").trim(),
-        barcodes,   // array
-        qty: 1
-    };
-}
-
-// Returns a single label object for a barcode
-function findByBarcode(barcode) {
-    const norm = v => String(v || "").trim().toLowerCase();
-    const row  = productDB.find(r => norm(r.Barcode) === norm(barcode));
-    if (!row) return null;
-
-    // If this row has a PIP, collect all sibling barcodes too
-    const pip      = String(row.PIP || "").trim();
-    const barcodes = pip
-        ? [...new Set(
-            productDB
-                .filter(r => String(r.PIP || "").trim().toLowerCase() === pip.toLowerCase())
-                .map(r => String(r.Barcode || "").trim()).filter(Boolean)
-          )]
-        : [String(row.Barcode || "").trim()].filter(Boolean);
-
-    return {
-        name:     String(row.Name         || "").trim(),
-        price:    parsePriceInput(row.Price),
-        pip:      pip,
-        packSize: String(row["Pack Size"] || "").trim(),
-        barcodes,
-        qty: 1
-    };
-}
-
 function findProduct(code) {
     if (!productDB.length) return null;
+    const norm = v => String(v || "").trim().toLowerCase();
+    const c    = norm(code);
     const type = detectCodeType(code);
-    if (type === "pip")     return findByPIP(code);
-    if (type === "barcode") return findByBarcode(code);
-    // "both" — try PIP first, then barcode
-    return findByPIP(code) || findByBarcode(code);
+
+    // PIP search
+    if (type === "pip" || type === "both") {
+        const rows = productDB.filter(r => norm(r[COL_PIP]) === c);
+        if (rows.length) return buildLabel(rows);
+    }
+
+    // Barcode search — checks both primary Barcode and Other Barcodes columns
+    if (type === "barcode" || type === "both") {
+        const rows = productDB.filter(r => extractBarcodes(r).map(b => b.toLowerCase()).includes(c));
+        if (rows.length) {
+            // Group by PIP if they share one, otherwise just use matched rows
+            const pip = String(rows[0][COL_PIP] || "").trim();
+            const allRows = pip
+                ? productDB.filter(r => String(r[COL_PIP] || "").trim().toLowerCase() === pip.toLowerCase())
+                : rows;
+            return buildLabel(allRows);
+        }
+    }
+
+    return null;
 }
 
 // ─── DUPLICATE CHECK ─────────────────────────────────────────────────────────
-// A product is already queued if its PIP matches (when present),
-// or if any of its barcodes overlap with a queued item.
 function alreadyQueued(label) {
     return labelList.some(existing => {
         if (label.pip && existing.pip && label.pip === existing.pip) return true;
-        if (label.barcodes && existing.barcodes)
-            return label.barcodes.some(b => existing.barcodes.includes(b));
-        return false;
+        return label.barcodes.some(b => existing.barcodes.includes(b));
     });
 }
 
@@ -333,7 +328,6 @@ function lookupSingle() {
         document.getElementById("manualName").focus();
         showToast(`"${code}" not found — fill in details below.`, "darkorange");
     }
-
     document.getElementById("barcodeInput").value = "";
     document.getElementById("barcodeInput").focus();
 }
@@ -341,27 +335,18 @@ document.getElementById("barcodeInput").addEventListener("keypress", e => { if (
 
 // ─── BULK BARCODES ───────────────────────────────────────────────────────────
 function processBulkBarcodes() {
-    const raw = document.getElementById("bulkBarcodes").value;
-    // Split on newlines, commas, or spaces — but be careful not to break
-    // comma-separated values inside a line. We treat each line separately first.
-    const codes = raw.split(/[\n]+/)
-        .flatMap(line => line.split(/[,\s]+/))
+    const codes = document.getElementById("bulkBarcodes").value
+        .split(/\n+/).flatMap(line => line.split(/[\s,]+/))
         .map(s => s.trim()).filter(Boolean);
-
     if (!codes.length) return;
     if (!productDB.length) { showToast("Product database not loaded yet.", "crimson"); return; }
 
     let matched = 0, skipped = 0, newUnmatched = [];
-
     codes.forEach(code => {
         const label = findProduct(code);
         if (label) {
-            if (alreadyQueued(label)) {
-                skipped++;
-            } else {
-                labelList.push(label);
-                matched++;
-            }
+            if (alreadyQueued(label)) { skipped++; }
+            else { labelList.push(label); matched++; }
         } else {
             if (!unmatchedCodes.includes(code)) newUnmatched.push(code);
         }
@@ -372,11 +357,10 @@ function processBulkBarcodes() {
     renderUnmatched();
 
     const parts = [`✔ ${matched} added`];
-    if (skipped)           parts.push(`${skipped} already queued`);
+    if (skipped)             parts.push(`${skipped} already queued`);
     if (newUnmatched.length) parts.push(`${newUnmatched.length} unmatched`);
     document.getElementById("bulkStatus").textContent = parts.join(" · ");
 }
-
 function clearBulkBarcodes() {
     document.getElementById("bulkBarcodes").value = "";
     document.getElementById("bulkStatus").textContent = "";
@@ -398,19 +382,22 @@ function downloadUnmatched() {
 function addManualProduct() {
     const name     = document.getElementById("manualName").value.trim();
     const price    = document.getElementById("manualPrice").value.trim();
-    const barcodesRaw = document.getElementById("manualBarcode").value.trim();
+    const primary  = document.getElementById("manualBarcode").value.trim();
+    const others   = document.getElementById("manualOther").value.trim();
     const pip      = document.getElementById("manualPIP").value.trim();
     const packSize = document.getElementById("manualPackSize").value.trim();
     const qty      = Math.max(1, parseInt(document.getElementById("manualQty").value, 10) || 1);
 
     if (!name || !price) { showToast("Name and Price are required.", "crimson"); return; }
 
-    const barcodes = barcodesRaw ? barcodesRaw.split(",").map(s => s.trim()).filter(Boolean) : [];
+    const barcodes = [...new Set(
+        [primary, ...others.split(",").map(s => s.trim())].filter(Boolean)
+    )];
 
-    labelList.push({ name, price: parsePriceInput(price), barcodes, pip, packSize, qty });
+    labelList.push({ name, price: parsePriceInput(price), barcodes, primaryBarcode: primary, pip, packSize, qty });
     renderList();
-    ["manualName","manualPrice","manualBarcode","manualPIP","manualPackSize"].forEach(id =>
-        document.getElementById(id).value = "");
+    ["manualName","manualPrice","manualBarcode","manualOther","manualPIP","manualPackSize"]
+        .forEach(id => document.getElementById(id).value = "");
     document.getElementById("manualQty").value = "1";
 }
 
@@ -420,8 +407,10 @@ function renderList() {
 
     document.getElementById("results").innerHTML = labelList.map((p, i) => {
         const barcodeHtml = p.barcodes && p.barcodes.length
-            ? `<div class="barcode-list">${p.barcodes.map(b =>
-                `<span class="barcode-chip">🔢 ${escHtml(b)}</span>`).join("")}</div>`
+            ? `<div class="barcode-list">${p.barcodes.map(b => {
+                const isPrimary = b === p.primaryBarcode;
+                return `<span class="barcode-chip${isPrimary ? " primary" : ""}" title="${isPrimary ? "Primary barcode" : "Other barcode"}">🔢 ${escHtml(b)}</span>`;
+              }).join("")}</div>`
             : "";
 
         return `
@@ -466,13 +455,11 @@ function startEdit(idx, field, spanEl) {
     input.type  = field === "price" ? "number" : "text";
     if (field === "price") { input.step = "0.01"; input.min = "0"; }
     input.value = current;
-    spanEl.innerHTML = "";
-    spanEl.appendChild(input);
+    spanEl.innerHTML = ""; spanEl.appendChild(input);
     input.focus(); input.select();
 
     const commit = () => {
-        const raw = input.value.trim();
-        labelList[idx][field] = field === "price" ? parsePriceInput(raw) : raw;
+        labelList[idx][field] = field === "price" ? parsePriceInput(input.value.trim()) : input.value.trim();
         renderList();
     };
     input.addEventListener("blur", commit);
@@ -501,78 +488,94 @@ function onExcelFileChosen(input) {
     };
     reader.readAsArrayBuffer(file);
 }
+
 function populateColumnDropdowns(headers) {
-    ["mapName","mapPrice","mapBarcode","mapPackSize","mapPIP","mapQty"].forEach(id => {
+    ["mapName","mapPrice","mapBarcode","mapOtherBarcodes","mapPackSize","mapPIP","mapQty"].forEach(id => {
         const sel = document.getElementById(id);
-        sel.innerHTML = ["mapQty","mapPackSize","mapPIP"].includes(id) ? '<option value="">(none)</option>' : "";
+        sel.innerHTML = ["mapQty","mapPackSize","mapPIP","mapOtherBarcodes"].includes(id)
+            ? '<option value="">(none)</option>' : "";
         headers.forEach(h => { const o = document.createElement("option"); o.value=h; o.textContent=h; sel.appendChild(o); });
     });
+    // Auto-select using your exact column names first, then fallback keywords
+    autoSelectExact("mapName",          COL_NAME);
+    autoSelectExact("mapPrice",         COL_PRICE);
+    autoSelectExact("mapBarcode",       COL_BARCODE);
+    autoSelectExact("mapOtherBarcodes", COL_OTHER_BARCODES);
+    autoSelectExact("mapPackSize",      COL_PACK_SIZE);
+    autoSelectExact("mapPIP",           COL_PIP);
+    // Fallback fuzzy matches
     autoSelect("mapName",     ["name","product","description","title","item"]);
     autoSelect("mapPrice",    ["price","cost","rrp","retail","amount"]);
-    autoSelect("mapBarcode",  ["barcode","ean","upc","sku","code"]);
+    autoSelect("mapBarcode",  ["barcode","ean","upc","sku"]);
+    autoSelect("mapOtherBarcodes", ["other"]);
     autoSelect("mapPackSize", ["pack","size","unit","volume","weight","tablet","ml","mg"]);
     autoSelect("mapPIP",      ["pip"]);
     autoSelect("mapQty",      ["qty","quantity","count"]);
 }
+
+function autoSelectExact(selectId, colName) {
+    const sel = document.getElementById(selectId);
+    const match = excelHeaders.find(h => h.trim().toLowerCase() === colName.toLowerCase());
+    if (match) sel.value = match;
+}
 function autoSelect(id, keywords) {
     const sel = document.getElementById(id);
+    if (sel.value) return; // already set by exact match
     const lower = excelHeaders.map(h => h.toLowerCase());
     for (const kw of keywords) {
         const idx = lower.findIndex(h => h.includes(kw));
         if (idx !== -1) { sel.value = excelHeaders[idx]; return; }
     }
 }
+
 function importFromExcel() {
-    const nc=document.getElementById("mapName").value, pc=document.getElementById("mapPrice").value,
-          bc=document.getElementById("mapBarcode").value, sc=document.getElementById("mapPackSize").value,
-          ic=document.getElementById("mapPIP").value,    qc=document.getElementById("mapQty").value;
-    if (!nc||!pc||!bc) { setExcelStatus("Map Name, Price and Barcode first.", "error"); return; }
+    const nc  = document.getElementById("mapName").value;
+    const pc  = document.getElementById("mapPrice").value;
+    const bc  = document.getElementById("mapBarcode").value;
+    const obc = document.getElementById("mapOtherBarcodes").value;
+    const sc  = document.getElementById("mapPackSize").value;
+    const ic  = document.getElementById("mapPIP").value;
+    const qc  = document.getElementById("mapQty").value;
+    if (!nc || !pc || !bc) { setExcelStatus("Map Name, Price and Barcode first.", "error"); return; }
 
-    // Group rows by PIP where possible, otherwise treat each row individually
-    const pipGroups = {};
-    const noPIPRows = [];
-
+    // Group by PIP where available
+    const pipGroups = {}, noPIPRows = [];
     excelRows.forEach(row => {
         const pip = ic ? String(row[ic]||"").trim() : "";
-        if (pip) {
-            if (!pipGroups[pip]) pipGroups[pip] = [];
-            pipGroups[pip].push(row);
-        } else {
-            noPIPRows.push(row);
-        }
+        pip ? (pipGroups[pip] = pipGroups[pip] || [], pipGroups[pip].push(row)) : noPIPRows.push(row);
     });
 
     let n = 0;
 
-    // Add one label per PIP group
     Object.entries(pipGroups).forEach(([pip, rows]) => {
-        const base     = rows[0];
-        const barcodes = [...new Set(rows.map(r => String(r[bc]||"").trim()).filter(Boolean))];
-        const name     = String(base[nc]||"").trim();
+        const base = rows[0];
+        const barcodes = [...new Set(rows.flatMap(r => {
+            const primary = String(r[bc]||"").trim();
+            const others  = obc ? String(r[obc]||"").split(",").map(s=>s.trim()).filter(Boolean) : [];
+            return [primary, ...others].filter(Boolean);
+        }))];
+        const name = String(base[nc]||"").trim();
         if (!name && !barcodes.length) return;
         labelList.push({
-            name:     name || "(no name)",
-            price:    parsePriceInput(base[pc]),
-            barcodes,
-            pip,
-            packSize: sc ? String(base[sc]||"").trim() : "",
-            qty:      qc ? Math.max(1, parseInt(base[qc],10)||1) : 1
+            name: name || "(no name)", price: parsePriceInput(base[pc]),
+            barcodes, primaryBarcode: String(base[bc]||"").trim(),
+            pip, packSize: sc ? String(base[sc]||"").trim() : "",
+            qty: qc ? Math.max(1, parseInt(base[qc],10)||1) : 1
         });
         n++;
     });
 
-    // Rows without a PIP — one label per row
     noPIPRows.forEach(row => {
-        const name    = String(row[nc]||"").trim();
-        const barcode = String(row[bc]||"").trim();
-        if (!name && !barcode) return;
+        const primary = String(row[bc]||"").trim();
+        const others  = obc ? String(row[obc]||"").split(",").map(s=>s.trim()).filter(Boolean) : [];
+        const barcodes = [...new Set([primary, ...others].filter(Boolean))];
+        const name = String(row[nc]||"").trim();
+        if (!name && !barcodes.length) return;
         labelList.push({
-            name:     name || "(no name)",
-            price:    parsePriceInput(row[pc]),
-            barcodes: barcode ? [barcode] : [],
-            pip:      "",
+            name: name || "(no name)", price: parsePriceInput(row[pc]),
+            barcodes, primaryBarcode: primary, pip: "",
             packSize: sc ? String(row[sc]||"").trim() : "",
-            qty:      qc ? Math.max(1, parseInt(row[qc],10)||1) : 1
+            qty: qc ? Math.max(1, parseInt(row[qc],10)||1) : 1
         });
         n++;
     });
@@ -616,13 +619,16 @@ async function generatePDF() {
 // ─── SESSION LOG ─────────────────────────────────────────────────────────────
 function downloadSessionLog() {
     if (!sessionLog.length) return;
-    const rows = ["Timestamp,Product Name,Barcodes,PIP,Pack Size,Price,Qty"];
+    const rows = ["Timestamp,Product Name,Primary Barcode,Other Barcodes,PIP,Pack Size,Price,Qty"];
     sessionLog.forEach(run => {
         run.products.forEach(p => {
+            const primary = p.primaryBarcode || "";
+            const others  = (p.barcodes || []).filter(b => b !== primary).join("; ");
             rows.push([
                 `"${run.timestamp}"`,
                 `"${(p.name||"").replace(/"/g,'""')}"`,
-                `"${(p.barcodes||[]).join("; ").replace(/"/g,'""')}"`,
+                `"${primary.replace(/"/g,'""')}"`,
+                `"${others.replace(/"/g,'""')}"`,
                 `"${(p.pip||"").replace(/"/g,'""')}"`,
                 `"${(p.packSize||"").replace(/"/g,'""')}"`,
                 formatPrice(p.price),
@@ -674,11 +680,8 @@ function showToast(msg, color) {
     clearTimeout(_tt); _tt=setTimeout(()=>t.style.opacity="0",3800);
 }
 
-// ─── INIT ────────────────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded", () => {
-    renderList();
-    renderUnmatched();
-    loadProductsCSV();
+    renderList(); renderUnmatched(); loadProductsCSV();
 });
 </script>
 </body>
