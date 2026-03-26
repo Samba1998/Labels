@@ -274,11 +274,11 @@ function renderList(){
     document.getElementById("results").innerHTML=labelList.map((p,i)=>{
         const barcodeHtml=p.barcodes&&p.barcodes.length ? `<div class="barcode-list">${p.barcodes.map(b=>`<span class="barcode-chip${b===p.primaryBarcode?" primary":""}" title="${b===p.primaryBarcode?"Primary barcode":"Other barcode"}">🔢 ${escHtml(b)}</span>`).join("")}</div>` : "";
         return `<div class="card" id="card-${i}">
-            <h4><span class="editable" onclick="startEdit(${i},'name',this)" title="Click to edit">${escHtml(p.name)||'<em style="color:#bbb">No name</em>'}</span></h4>
+            <h4><span class="editable" onclick="startEdit(${i},'name',this)" title="Click to edit">${escHtml(sanitiseText(p.name))||'<em style="color:#bbb">No name</em>'}</span></h4>
             <p>💷 <span class="editable" onclick="startEdit(${i},'price',this)" title="Click to edit">${formatPrice(p.price)}</span></p>
             ${p.pip?`<p>💊 PIP: ${escHtml(p.pip)}</p>`:""}
             ${barcodeHtml}
-            <p>📦 <span class="editable" onclick="startEdit(${i},'packSize',this)" title="Click to edit">${escHtml(p.packSize)||'<em style="color:#bbb">No pack size</em>'}</span></p>
+            <p>📦 <span class="editable" onclick="startEdit(${i},'packSize',this)" title="Click to edit">${escHtml(sanitiseText(p.packSize))||'<em style="color:#bbb">No pack size</em>'}</span></p>
             <div class="qty-row">Qty: <input type="number" min="1" value="${p.qty||1}" onchange="updateQty(${i},this.value)"></div>
             <span class="edit-hint">Click name, price or pack size to edit</span>
             <button class="card-remove" onclick="removeFromList(${i})">Remove</button>
@@ -365,8 +365,8 @@ async function generatePDF(){
         for(const item of labelList){ for(let c=0;c<(item.qty||1);c++){
             if(!first) doc.addPage(); first=false;
             doc.setFont("helvetica","normal"); doc.setFontSize(12);
-            doc.text(doc.splitTextToSize(item.name,48).slice(0,2),5,6);
-            if(item.packSize){ doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.text(String(item.packSize),5,17); }
+            doc.text(doc.splitTextToSize(sanitiseText(item.name),48).slice(0,2),5,6);
+            if(item.packSize){ doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.text(sanitiseText(String(item.packSize)),5,17); }
             doc.setFont("helvetica","bold"); doc.setFontSize(30); doc.text(formatPrice(item.price),5,33);
         }}
         doc.save("labels.pdf");
@@ -401,6 +401,17 @@ function parsePriceInput(str){ const n=parseFloat(String(str??"").replace(/[^\d.
 function formatPrice(num){ return "£"+Number(num||0).toFixed(2); }
 function escHtml(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function triggerDownload(filename,text){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:"text/csv"})); a.download=filename; a.click(); }
+
+// Replaces characters jsPDF cannot render (shows as ? or causes errors)
+function sanitiseText(str){
+    return String(str||"")
+        .replace(/\u00b5|\u03bc/g,"mc")  // micro sign / Greek mu -> mc (mcg, mcl etc.)
+        .replace(/\u00b0/g,"deg ")         // degree sign
+        .replace(/\u00b1/g,"+/-")          // plus-minus
+        .replace(/\u00d7/g,"x")            // multiplication sign
+        .replace(/\u00f7/g,"/")            // division sign
+        .replace(/[^\x00-\x7E]/g,"?");    // catch-all for remaining non-ASCII
+}
 
 let _tt;
 function showToast(msg,color){
