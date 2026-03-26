@@ -77,6 +77,30 @@
         .btn-pdf:hover { background: #F57C00; }
         .bottom-spacer { height: 70px; }
         #bulkStatus { font-size: 0.84em; color: #555; margin-top: 4px; margin-bottom: 4px; }
+        /* ── name search ── */
+        .search-wrap { position: relative; flex: 1; min-width: 200px; }
+        .search-wrap input { width: 100%; padding: 11px 14px; font-size: 1em; border-radius: 8px; border: 1px solid #ccc; transition: border-color 0.2s; }
+        .search-wrap input:focus { border-color: rgb(239,118,39); outline: none; }
+        .search-dropdown {
+            display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+            background: white; border: 1px solid #ddd; border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 50;
+            max-height: 320px; overflow-y: auto;
+        }
+        .search-dropdown.open { display: block; }
+        .search-result-item {
+            padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            transition: background 0.12s;
+        }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background: #f5f7ff; }
+        .search-result-item .sri-name { font-size: 0.9em; font-weight: 600; color: rgb(40,51,130); flex: 1; }
+        .search-result-item .sri-meta { font-size: 0.76em; color: #888; white-space: nowrap; }
+        .search-result-item .sri-price { font-size: 0.88em; font-weight: bold; color: rgb(239,118,39); white-space: nowrap; }
+        .search-no-results { padding: 14px; text-align: center; color: #aaa; font-size: 0.88em; }
+        .search-result-item mark { background: #fff0cc; border-radius: 3px; padding: 0 1px; font-style: normal; }
+
     </style>
 </head>
 <body>
@@ -111,6 +135,14 @@
       </div>
       <div id="excelStatus"></div>
     </div>
+    <div class="section-label">🔎 Search by Product Name</div>
+    <div class="scanner-card">
+      <div class="search-wrap" id="searchWrap">
+        <input id="nameSearchInput" type="text" placeholder="Start typing a product name…" autocomplete="off" oninput="onNameSearch(this.value)">
+        <div class="search-dropdown" id="searchDropdown"></div>
+      </div>
+    </div>
+
     <div class="section-label">🔍 Barcode / PIP Lookup</div>
     <div class="scanner-card">
       <input id="barcodeInput" type="text" placeholder="Scan or type barcode / PIP code…" autofocus>
@@ -420,6 +452,90 @@ function showToast(msg,color){
     t.style.background=color||"#333"; t.textContent=msg; t.style.opacity="1";
     clearTimeout(_tt); _tt=setTimeout(()=>t.style.opacity="0",3800);
 }
+
+
+// ── NAME SEARCH ──────────────────────────────────────────────────────────────
+function onNameSearch(query) {
+    const dropdown = document.getElementById("searchDropdown");
+    const q = query.trim().toLowerCase();
+
+    if (q.length < 2) { dropdown.classList.remove("open"); dropdown.innerHTML = ""; return; }
+
+    // Deduplicate by PIP (if present) or primary barcode, then name
+    const seen = new Set();
+    const matches = [];
+    for (const row of productDB) {
+        const name = String(row[COL_NAME] || "").trim();
+        if (!name.toLowerCase().includes(q)) continue;
+        const key = String(row[COL_PIP] || row[COL_BARCODE] || name);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        matches.push(row);
+        if (matches.length >= 20) break;
+    }
+
+    if (!matches.length) {
+        dropdown.innerHTML = '<div class="search-no-results">No products found</div>';
+        dropdown.classList.add("open");
+        return;
+    }
+
+    dropdown.innerHTML = matches.map((row, i) => {
+        const name     = sanitiseText(String(row[COL_NAME]     || "").trim());
+        const packSize = sanitiseText(String(row[COL_PACK_SIZE] || "").trim());
+        const price    = formatPrice(parsePriceInput(row[COL_PRICE]));
+        const pip      = String(row[COL_PIP] || "").trim();
+        // Highlight matching portion
+        const re       = new RegExp("(" + q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + ")", "gi");
+        const nameHL   = escHtml(name).replace(re, "<mark>$1</mark>");
+        const meta     = [packSize, pip ? "PIP: "+pip : ""].filter(Boolean).join(" · ");
+        return `<div class="search-result-item" onclick="addFromNameSearch(${i})" data-idx="${i}">
+            <span class="sri-name">${nameHL}</span>
+            ${meta ? `<span class="sri-meta">${escHtml(meta)}</span>` : ""}
+            <span class="sri-price">${price}</span>
+        </div>`;
+    }).join("");
+
+    // Store matches for retrieval on click
+    dropdown._matches = matches;
+    dropdown.classList.add("open");
+}
+
+function addFromNameSearch(i) {
+    const dropdown = document.getElementById("searchDropdown");
+    const row = dropdown._matches && dropdown._matches[i];
+    if (!row) return;
+
+    // Build label same way as a PIP lookup — collect all rows sharing the PIP
+    const pip = String(row[COL_PIP] || "").trim();
+    const norm = v => String(v || "").trim().toLowerCase();
+    const rows = pip
+        ? productDB.filter(r => norm(r[COL_PIP]) === norm(pip))
+        : [row];
+    const label = buildLabel(rows);
+
+    if (alreadyQueued(label)) {
+        showToast('"' + label.name + '" is already in the queue.', "steelblue");
+    } else {
+        labelList.push(label);
+        renderList();
+        showToast('"' + sanitiseText(label.name) + '" added.', "rgb(40,51,130)");
+    }
+
+    // Clear search
+    document.getElementById("nameSearchInput").value = "";
+    dropdown.classList.remove("open");
+    dropdown.innerHTML = "";
+}
+
+// Close dropdown when clicking outside
+document.addEventListener("click", e => {
+    const wrap = document.getElementById("searchWrap");
+    if (wrap && !wrap.contains(e.target)) {
+        const dd = document.getElementById("searchDropdown");
+        if (dd) { dd.classList.remove("open"); }
+    }
+});
 
 window.addEventListener("DOMContentLoaded",()=>{ renderList(); renderUnmatched(); loadProductsCSV(); });
 </script>
