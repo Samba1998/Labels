@@ -8,26 +8,12 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; color: #333; }
-
-        header {
-            background: rgb(40,51,130);
-            color: rgb(239,118,39);
-            padding: 20px 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 1.6em;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-        }
+        header { background: rgb(40,51,130); color: rgb(239,118,39); padding: 20px 30px; display: flex; align-items: center; justify-content: space-between; font-size: 1.6em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
         header .db-status { font-size: 0.46em; font-weight: normal; color: rgba(255,255,255,0.75); background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 20px; }
         header .db-status.ok  { color: #a8ffb0; }
         header .db-status.err { color: #ffaaaa; }
-
         .page-body { display: flex; align-items: flex-start; gap: 20px; max-width: 1300px; margin: 28px auto; padding: 0 20px; }
         .main-col  { flex: 1; min-width: 0; }
-
-        /* unmatched sidebar */
         .unmatched-panel { width: 270px; flex-shrink: 0; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); position: sticky; top: 20px; max-height: calc(100vh - 40px); display: flex; flex-direction: column; }
         .unmatched-panel h3 { margin: 0; padding: 13px 16px; font-size: 0.92em; background: rgb(40,51,130); color: white; border-radius: 12px 12px 0 0; display: flex; align-items: center; justify-content: space-between; }
         .unmatched-panel .badge { background: rgb(239,118,39); color: white; border-radius: 12px; padding: 2px 9px; font-size: 0.85em; }
@@ -38,9 +24,7 @@
         .unmatched-actions button { width: 100%; background: rgb(40,51,130); color: white; border: none; padding: 9px; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: bold; transition: background 0.2s; }
         .unmatched-actions button:hover { background: rgb(60,75,180); }
         .unmatched-actions button:disabled { background: #ccc; cursor: not-allowed; }
-
         .section-label { font-size: 0.72em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.06em; color: #999; margin: 22px 0 6px 2px; }
-
         .scanner-card { background: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
         .scanner-card input, .scanner-card textarea { flex: 1; padding: 11px 14px; font-size: 1em; border-radius: 8px; border: 1px solid #ccc; transition: border-color 0.2s; min-width: 110px; }
         .scanner-card textarea { resize: vertical; }
@@ -50,7 +34,6 @@
         .scanner-card button.secondary { background: #888; }
         .scanner-card button.secondary:hover { background: #555; }
         .lookup-hint { font-size: 0.73em; color: #bbb; width: 100%; margin-top: -4px; }
-
         .excel-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 12px; }
         .excel-card h3 { margin: 0 0 12px; color: rgb(40,51,130); font-size: 1em; }
         .excel-card .excel-row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
@@ -65,34 +48,25 @@
         #excelStatus { margin-top: 10px; font-size: 0.85em; }
         #excelStatus.success { color: #2a7a2a; }
         #excelStatus.error   { color: #b00; }
-
-        /* product cards */
         .results { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 14px; }
         .card { background: white; padding: 14px 16px 46px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.06); position: relative; transition: transform 0.15s, box-shadow 0.15s; }
         .card:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.1); }
-
         .editable { display: inline-block; border-radius: 5px; padding: 1px 4px; margin: 1px -4px; cursor: text; transition: background 0.15s; max-width: 100%; word-break: break-word; }
         .editable:hover { background: #f0f4ff; }
         .editable:hover::after { content: " ✎"; font-size: 0.75em; color: rgb(40,51,130); opacity: 0.6; }
-
         .card h4 { margin: 0 0 7px; font-size: 1em; color: rgb(40,51,130); line-height: 1.3; }
         .card h4 .editable { color: rgb(40,51,130); font-weight: bold; }
         .card p  { margin: 3px 0; font-size: 0.83em; color: #555; line-height: 1.4; }
         .card p .editable { font-size: 1em; color: #555; }
-
         .barcode-list { margin: 4px 0 2px; }
         .barcode-chip { display: inline-block; background: #f0f2f5; border-radius: 5px; padding: 2px 7px; margin: 2px 3px 2px 0; font-size: 0.78em; font-family: monospace; color: #444; }
         .barcode-chip.primary { background: #e8eeff; color: rgb(40,51,130); font-weight: bold; }
-
         .inline-input { border: 2px solid rgb(239,118,39); border-radius: 6px; padding: 2px 6px; font-size: inherit; font-family: inherit; color: inherit; background: #fffbf7; outline: none; width: 100%; }
-
         .card .edit-hint { font-size: 0.69em; color: #ccc; margin-top: 7px; display: block; }
         .card .card-remove { position: absolute; bottom: 10px; right: 10px; background: rgb(239,118,39); border: none; color: white; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.78em; transition: background 0.2s; }
         .card .card-remove:hover { background: rgb(187,103,48); }
-
         .qty-row { display: flex; align-items: center; gap: 6px; margin-top: 7px; font-size: 0.83em; color: #555; }
         .qty-row input { width: 55px; padding: 3px 6px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.95em; }
-
         .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e0e0e0; padding: 12px 30px; display: flex; align-items: center; gap: 12px; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.07); }
         .action-bar .product-count { flex: 1; font-size: 0.88em; color: #888; }
         .action-bar button { padding: 13px 24px; border: none; border-radius: 10px; font-size: 0.95em; font-weight: bold; cursor: pointer; transition: background 0.2s; }
@@ -101,22 +75,17 @@
         .btn-log:disabled, .btn-pdf:disabled { background: #ccc; cursor: not-allowed; }
         .btn-pdf { background: #FF9800; color: white; }
         .btn-pdf:hover { background: #F57C00; }
-
         .bottom-spacer { height: 70px; }
         #bulkStatus { font-size: 0.84em; color: #555; margin-top: 4px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
-
 <header>
     🏷 Product Label Dashboard
     <span class="db-status" id="dbStatus">⏳ Loading database…</span>
 </header>
-
 <div class="page-body">
   <div class="main-col">
-
-    <!-- EXCEL IMPORT -->
     <div class="section-label">📥 Import from Excel / CSV file</div>
     <div class="excel-card">
       <h3>Upload a local Excel or CSV — map columns, then click Import</h3>
@@ -142,16 +111,12 @@
       </div>
       <div id="excelStatus"></div>
     </div>
-
-    <!-- LOOKUP -->
     <div class="section-label">🔍 Barcode / PIP Lookup</div>
     <div class="scanner-card">
       <input id="barcodeInput" type="text" placeholder="Scan or type barcode / PIP code…" autofocus>
       <button onclick="lookupSingle()">Add Product</button>
-      <div class="lookup-hint">Auto-detects: 7 digits = PIP &nbsp;|&nbsp; 8–13 digits = Barcode &nbsp;|&nbsp; anything else = searches both</div>
+      <div class="lookup-hint">Auto-detects: 8–13 digits = Barcode &nbsp;|&nbsp; everything else (7-digit PIP or internal code e.g. INT-001) = PIP / internal lookup</div>
     </div>
-
-    <!-- MANUAL ADD -->
     <div class="section-label">✏️ Manual Add</div>
     <div class="scanner-card">
       <input id="manualName"     type="text"   placeholder="Product Name">
@@ -163,8 +128,6 @@
       <input id="manualQty"      type="number" min="1" value="1" style="width:75px;">
       <button onclick="addManualProduct()">Add</button>
     </div>
-
-    <!-- BULK PASTE -->
     <div class="section-label">📋 Bulk Barcode / PIP Paste</div>
     <div class="scanner-card">
       <textarea id="bulkBarcodes" rows="4" placeholder="Paste or scan multiple barcodes / PIP codes — one per line, or separated by spaces / commas…"></textarea>
@@ -174,14 +137,10 @@
       </div>
     </div>
     <div id="bulkStatus"></div>
-
     <h3 style="margin-top:28px;margin-bottom:0;">Queued Products</h3>
     <div class="results" id="results"></div>
     <div class="bottom-spacer"></div>
-
   </div>
-
-  <!-- UNMATCHED SIDEBAR -->
   <div class="unmatched-panel">
     <h3>⚠️ Unmatched <span class="badge" id="unmatchedBadge">0</span></h3>
     <div class="unmatched-list" id="unmatchedList">
@@ -192,496 +151,266 @@
     </div>
   </div>
 </div>
-
 <div class="action-bar">
   <div class="product-count" id="productCount">No products queued.</div>
   <button class="btn-log" id="btnLog" onclick="downloadSessionLog()" disabled>⬇ Session Log</button>
   <button class="btn-pdf" id="btnPdf" onclick="generatePDF()" disabled>🖨 Generate Labels PDF</button>
 </div>
-
 <script>
-// ─────────────────────────────────────────────────────────────────────────────
-//  ⚙️  Replace with your raw GitHub URL for products.csv
-//  e.g. https://github.com/Samba1998/Labels/main/products.csv
-// ─────────────────────────────────────────────────────────────────────────────
+// ⚙️ FIXED: correct raw URL for Samba1998/Labels repo
 const PRODUCTS_CSV_URL = "https://raw.githubusercontent.com/Samba1998/Labels/main/products.csv";
-// ─── STATE ───────────────────────────────────────────────────────────────────
-let labelList      = [];
-let productDB      = [];
-let unmatchedCodes = [];
-let sessionLog     = [];
-let excelRows      = [];
-let excelHeaders   = [];
 
-// ─── CSV COLUMN NAMES (matching your exact headers) ──────────────────────────
-const COL_PIP            = "PIP";
-const COL_NAME           = "Name";
-const COL_PACK_SIZE      = "Pack Size";
-const COL_BARCODE        = "Barcode";
-const COL_PRICE          = "Price";
-const COL_OTHER_BARCODES = "Other Barcodes";
+let labelList=[], productDB=[], unmatchedCodes=[], sessionLog=[], excelRows=[], excelHeaders=[];
 
-// ─── LOAD PRODUCTS CSV ───────────────────────────────────────────────────────
+const COL_PIP="PIP", COL_NAME="Name", COL_PACK_SIZE="Pack Size",
+      COL_BARCODE="Barcode", COL_PRICE="Price", COL_OTHER_BARCODES="Other Barcodes";
+
 async function loadProductsCSV() {
-    setDbStatus("", "⏳ Loading database…");
+    setDbStatus("","⏳ Loading database…");
     try {
-        const resp = await fetch(PRODUCTS_CSV_URL + "?t=" + Date.now());
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const resp = await fetch(PRODUCTS_CSV_URL+"?t="+Date.now());
+        if (!resp.ok) throw new Error("HTTP "+resp.status);
         productDB = parseCSVToObjects(await resp.text());
-        setDbStatus("ok", `✔ ${productDB.length} rows loaded`);
-    } catch (err) {
-        setDbStatus("err", `✖ Could not load products.csv — ${err.message}`);
+        setDbStatus("ok","✔ "+productDB.length+" rows loaded");
+    } catch(err) { setDbStatus("err","✖ Could not load products.csv — "+err.message); }
+}
+function setDbStatus(cls,msg){ const el=document.getElementById("dbStatus"); el.textContent=msg; el.className="db-status "+cls; }
+
+function extractBarcodes(row){
+    const primary=String(row[COL_BARCODE]||"").trim();
+    const others=String(row[COL_OTHER_BARCODES]||"").split(",").map(s=>s.trim()).filter(Boolean);
+    return [...new Set([primary,...others].filter(Boolean))];
+}
+
+function buildLabel(rows,qty){
+    const base=rows[0];
+    const barcodes=[...new Set(rows.flatMap(r=>extractBarcodes(r)))];
+    return { name:String(base[COL_NAME]||"").trim(), price:parsePriceInput(base[COL_PRICE]),
+             pip:String(base[COL_PIP]||"").trim(), packSize:String(base[COL_PACK_SIZE]||"").trim(),
+             primaryBarcode:String(base[COL_BARCODE]||"").trim(), barcodes, qty:qty||1 };
+}
+
+function detectCodeType(code){
+    if(/^\d{8,13}$/.test(code)) return "barcode"; // EAN-8 to EAN-13, UPC
+    if(/^\d{7}$/.test(code))    return "pip";      // standard 7-digit PIP
+    return "pip";  // alphanumeric internal codes e.g. INT-001 — try PIP column first
+}
+
+function findProduct(code){
+    if(!productDB.length) return null;
+    const norm=v=>String(v||"").trim().toLowerCase(), c=norm(code), type=detectCodeType(code);
+    if(type==="pip"||type==="both"){
+        const rows=productDB.filter(r=>norm(r[COL_PIP])===c);
+        if(rows.length) return buildLabel(rows);
     }
-}
-function setDbStatus(cls, msg) {
-    const el = document.getElementById("dbStatus");
-    el.textContent = msg; el.className = "db-status " + cls;
-}
-
-// ─── BARCODE EXTRACTION ──────────────────────────────────────────────────────
-// Returns all barcodes for a row: primary + any extras from "Other Barcodes"
-function extractBarcodes(row) {
-    const primary = String(row[COL_BARCODE] || "").trim();
-    const others  = String(row[COL_OTHER_BARCODES] || "")
-        .split(",").map(s => s.trim()).filter(Boolean);
-    return [...new Set([primary, ...others].filter(Boolean))];
-}
-
-// ─── BUILD LABEL FROM ROW(S) ─────────────────────────────────────────────────
-// Accepts one or more rows sharing the same PIP and merges their barcodes
-function buildLabel(rows, qty) {
-    const base     = rows[0];
-    const barcodes = [...new Set(rows.flatMap(r => extractBarcodes(r)))];
-    return {
-        name:          String(base[COL_NAME]      || "").trim(),
-        price:         parsePriceInput(base[COL_PRICE]),
-        pip:           String(base[COL_PIP]        || "").trim(),
-        packSize:      String(base[COL_PACK_SIZE]  || "").trim(),
-        primaryBarcode: String(base[COL_BARCODE]   || "").trim(),
-        barcodes,
-        qty: qty || 1
-    };
-}
-
-// ─── LOOKUP ──────────────────────────────────────────────────────────────────
-function detectCodeType(code) {
-    if (/^\d{7}$/.test(code))    return "pip";
-    if (/^\d{8,13}$/.test(code)) return "barcode";
-    return "both";
-}
-
-function findProduct(code) {
-    if (!productDB.length) return null;
-    const norm = v => String(v || "").trim().toLowerCase();
-    const c    = norm(code);
-    const type = detectCodeType(code);
-
-    // PIP search
-    if (type === "pip" || type === "both") {
-        const rows = productDB.filter(r => norm(r[COL_PIP]) === c);
-        if (rows.length) return buildLabel(rows);
-    }
-
-    // Barcode search — checks both primary Barcode and Other Barcodes columns
-    if (type === "barcode" || type === "both") {
-        const rows = productDB.filter(r => extractBarcodes(r).map(b => b.toLowerCase()).includes(c));
-        if (rows.length) {
-            // Group by PIP if they share one, otherwise just use matched rows
-            const pip = String(rows[0][COL_PIP] || "").trim();
-            const allRows = pip
-                ? productDB.filter(r => String(r[COL_PIP] || "").trim().toLowerCase() === pip.toLowerCase())
-                : rows;
+    if(type==="barcode"||type==="both"){
+        const rows=productDB.filter(r=>extractBarcodes(r).map(b=>b.toLowerCase()).includes(c));
+        if(rows.length){
+            const pip=String(rows[0][COL_PIP]||"").trim();
+            const allRows=pip ? productDB.filter(r=>String(r[COL_PIP]||"").trim().toLowerCase()===pip.toLowerCase()) : rows;
             return buildLabel(allRows);
         }
     }
-
     return null;
 }
 
-// ─── DUPLICATE CHECK ─────────────────────────────────────────────────────────
-function alreadyQueued(label) {
-    return labelList.some(existing => {
-        if (label.pip && existing.pip && label.pip === existing.pip) return true;
-        return label.barcodes.some(b => existing.barcodes.includes(b));
+function alreadyQueued(label){
+    return labelList.some(ex=>{
+        if(label.pip&&ex.pip&&label.pip===ex.pip) return true;
+        return label.barcodes.some(b=>ex.barcodes.includes(b));
     });
 }
 
-// ─── SINGLE LOOKUP ───────────────────────────────────────────────────────────
-function lookupSingle() {
-    const code = document.getElementById("barcodeInput").value.trim();
-    if (!code) return;
-    if (!productDB.length) { showToast("Product database not loaded yet.", "crimson"); return; }
-
-    const label = findProduct(code);
-    if (label) {
-        if (alreadyQueued(label)) {
-            showToast(`"${label.name}" is already in the queue.`, "steelblue");
-        } else {
-            labelList.push(label);
-            renderList();
-        }
-    } else {
-        const isPIP = detectCodeType(code) === "pip";
-        document.getElementById(isPIP ? "manualPIP" : "manualBarcode").value = code;
-        document.getElementById(isPIP ? "manualBarcode" : "manualPIP").value = "";
+function lookupSingle(){
+    const code=document.getElementById("barcodeInput").value.trim(); if(!code) return;
+    if(!productDB.length){ showToast("Product database not loaded yet.","crimson"); return; }
+    const label=findProduct(code);
+    if(label){ if(alreadyQueued(label)) showToast('"'+label.name+'" is already in the queue.',"steelblue"); else { labelList.push(label); renderList(); } }
+    else {
+        const isPIP=detectCodeType(code)==="pip";
+        document.getElementById(isPIP?"manualPIP":"manualBarcode").value=code;
+        document.getElementById(isPIP?"manualBarcode":"manualPIP").value="";
         document.getElementById("manualName").focus();
-        showToast(`"${code}" not found — fill in details below.`, "darkorange");
+        showToast('"'+code+'" not found — fill in details below.',"darkorange");
     }
-    document.getElementById("barcodeInput").value = "";
-    document.getElementById("barcodeInput").focus();
+    document.getElementById("barcodeInput").value=""; document.getElementById("barcodeInput").focus();
 }
-document.getElementById("barcodeInput").addEventListener("keypress", e => { if (e.key === "Enter") lookupSingle(); });
+document.getElementById("barcodeInput").addEventListener("keypress",e=>{ if(e.key==="Enter") lookupSingle(); });
 
-// ─── BULK BARCODES ───────────────────────────────────────────────────────────
-function processBulkBarcodes() {
-    const codes = document.getElementById("bulkBarcodes").value
-        .split(/\n+/).flatMap(line => line.split(/[\s,]+/))
-        .map(s => s.trim()).filter(Boolean);
-    if (!codes.length) return;
-    if (!productDB.length) { showToast("Product database not loaded yet.", "crimson"); return; }
+function processBulkBarcodes(){
+    const codes=document.getElementById("bulkBarcodes").value.split(/\n+/).flatMap(l=>l.split(/[\s,]+/)).map(s=>s.trim()).filter(Boolean);
+    if(!codes.length) return;
+    if(!productDB.length){ showToast("Product database not loaded yet.","crimson"); return; }
+    let matched=0,skipped=0,newUnmatched=[];
+    codes.forEach(code=>{ const label=findProduct(code); if(label){ if(alreadyQueued(label)) skipped++; else { labelList.push(label); matched++; } } else { if(!unmatchedCodes.includes(code)) newUnmatched.push(code); } });
+    unmatchedCodes=[...unmatchedCodes,...newUnmatched]; renderList(); renderUnmatched();
+    const parts=["✔ "+matched+" added"]; if(skipped) parts.push(skipped+" already queued"); if(newUnmatched.length) parts.push(newUnmatched.length+" unmatched");
+    document.getElementById("bulkStatus").textContent=parts.join(" · ");
+}
+function clearBulkBarcodes(){ document.getElementById("bulkBarcodes").value=""; document.getElementById("bulkStatus").textContent=""; }
 
-    let matched = 0, skipped = 0, newUnmatched = [];
-    codes.forEach(code => {
-        const label = findProduct(code);
-        if (label) {
-            if (alreadyQueued(label)) { skipped++; }
-            else { labelList.push(label); matched++; }
-        } else {
-            if (!unmatchedCodes.includes(code)) newUnmatched.push(code);
-        }
-    });
+function renderUnmatched(){
+    document.getElementById("unmatchedBadge").textContent=unmatchedCodes.length;
+    document.getElementById("downloadUnmatchedBtn").disabled=!unmatchedCodes.length;
+    document.getElementById("unmatchedList").innerHTML=unmatchedCodes.length ? unmatchedCodes.map(c=>`<div class="unmatched-item">${escHtml(c)}</div>`).join("") : '<div class="unmatched-empty">No unmatched codes yet.</div>';
+}
+function downloadUnmatched(){ triggerDownload("unmatched_codes.csv","code\n"+unmatchedCodes.join("\n")); }
 
-    unmatchedCodes = [...unmatchedCodes, ...newUnmatched];
+function addManualProduct(){
+    const name=document.getElementById("manualName").value.trim(), price=document.getElementById("manualPrice").value.trim();
+    const primary=document.getElementById("manualBarcode").value.trim(), others=document.getElementById("manualOther").value.trim();
+    const pip=document.getElementById("manualPIP").value.trim(), packSize=document.getElementById("manualPackSize").value.trim();
+    const qty=Math.max(1,parseInt(document.getElementById("manualQty").value,10)||1);
+    if(!name||!price){ showToast("Name and Price are required.","crimson"); return; }
+    const barcodes=[...new Set([primary,...others.split(",").map(s=>s.trim())].filter(Boolean))];
+    labelList.push({name,price:parsePriceInput(price),barcodes,primaryBarcode:primary,pip,packSize,qty});
     renderList();
-    renderUnmatched();
-
-    const parts = [`✔ ${matched} added`];
-    if (skipped)             parts.push(`${skipped} already queued`);
-    if (newUnmatched.length) parts.push(`${newUnmatched.length} unmatched`);
-    document.getElementById("bulkStatus").textContent = parts.join(" · ");
-}
-function clearBulkBarcodes() {
-    document.getElementById("bulkBarcodes").value = "";
-    document.getElementById("bulkStatus").textContent = "";
+    ["manualName","manualPrice","manualBarcode","manualOther","manualPIP","manualPackSize"].forEach(id=>document.getElementById(id).value="");
+    document.getElementById("manualQty").value="1";
 }
 
-// ─── UNMATCHED ───────────────────────────────────────────────────────────────
-function renderUnmatched() {
-    document.getElementById("unmatchedBadge").textContent    = unmatchedCodes.length;
-    document.getElementById("downloadUnmatchedBtn").disabled = !unmatchedCodes.length;
-    document.getElementById("unmatchedList").innerHTML = unmatchedCodes.length
-        ? unmatchedCodes.map(c => `<div class="unmatched-item">${escHtml(c)}</div>`).join("")
-        : '<div class="unmatched-empty">No unmatched codes yet.</div>';
-}
-function downloadUnmatched() {
-    triggerDownload("unmatched_codes.csv", "code\n" + unmatchedCodes.join("\n"));
-}
-
-// ─── MANUAL ADD ──────────────────────────────────────────────────────────────
-function addManualProduct() {
-    const name     = document.getElementById("manualName").value.trim();
-    const price    = document.getElementById("manualPrice").value.trim();
-    const primary  = document.getElementById("manualBarcode").value.trim();
-    const others   = document.getElementById("manualOther").value.trim();
-    const pip      = document.getElementById("manualPIP").value.trim();
-    const packSize = document.getElementById("manualPackSize").value.trim();
-    const qty      = Math.max(1, parseInt(document.getElementById("manualQty").value, 10) || 1);
-
-    if (!name || !price) { showToast("Name and Price are required.", "crimson"); return; }
-
-    const barcodes = [...new Set(
-        [primary, ...others.split(",").map(s => s.trim())].filter(Boolean)
-    )];
-
-    labelList.push({ name, price: parsePriceInput(price), barcodes, primaryBarcode: primary, pip, packSize, qty });
-    renderList();
-    ["manualName","manualPrice","manualBarcode","manualOther","manualPIP","manualPackSize"]
-        .forEach(id => document.getElementById(id).value = "");
-    document.getElementById("manualQty").value = "1";
-}
-
-// ─── RENDER ──────────────────────────────────────────────────────────────────
-function renderList() {
-    const total = labelList.reduce((s, p) => s + (p.qty || 1), 0);
-
-    document.getElementById("results").innerHTML = labelList.map((p, i) => {
-        const barcodeHtml = p.barcodes && p.barcodes.length
-            ? `<div class="barcode-list">${p.barcodes.map(b => {
-                const isPrimary = b === p.primaryBarcode;
-                return `<span class="barcode-chip${isPrimary ? " primary" : ""}" title="${isPrimary ? "Primary barcode" : "Other barcode"}">🔢 ${escHtml(b)}</span>`;
-              }).join("")}</div>`
-            : "";
-
-        return `
-        <div class="card" id="card-${i}">
-            <h4>
-                <span class="editable" onclick="startEdit(${i},'name',this)" title="Click to edit">
-                    ${escHtml(p.name) || '<em style="color:#bbb">No name</em>'}
-                </span>
-            </h4>
+function renderList(){
+    const total=labelList.reduce((s,p)=>s+(p.qty||1),0);
+    document.getElementById("results").innerHTML=labelList.map((p,i)=>{
+        const barcodeHtml=p.barcodes&&p.barcodes.length ? `<div class="barcode-list">${p.barcodes.map(b=>`<span class="barcode-chip${b===p.primaryBarcode?" primary":""}" title="${b===p.primaryBarcode?"Primary barcode":"Other barcode"}">🔢 ${escHtml(b)}</span>`).join("")}</div>` : "";
+        return `<div class="card" id="card-${i}">
+            <h4><span class="editable" onclick="startEdit(${i},'name',this)" title="Click to edit">${escHtml(p.name)||'<em style="color:#bbb">No name</em>'}</span></h4>
             <p>💷 <span class="editable" onclick="startEdit(${i},'price',this)" title="Click to edit">${formatPrice(p.price)}</span></p>
-            ${p.pip ? `<p>💊 PIP: ${escHtml(p.pip)}</p>` : ""}
+            ${p.pip?`<p>💊 PIP: ${escHtml(p.pip)}</p>`:""}
             ${barcodeHtml}
-            <p>📦 <span class="editable" onclick="startEdit(${i},'packSize',this)" title="Click to edit">${escHtml(p.packSize) || '<em style="color:#bbb">No pack size</em>'}</span></p>
-            <div class="qty-row">
-                Qty: <input type="number" min="1" value="${p.qty||1}" onchange="updateQty(${i},this.value)">
-            </div>
+            <p>📦 <span class="editable" onclick="startEdit(${i},'packSize',this)" title="Click to edit">${escHtml(p.packSize)||'<em style="color:#bbb">No pack size</em>'}</span></p>
+            <div class="qty-row">Qty: <input type="number" min="1" value="${p.qty||1}" onchange="updateQty(${i},this.value)"></div>
             <span class="edit-hint">Click name, price or pack size to edit</span>
             <button class="card-remove" onclick="removeFromList(${i})">Remove</button>
         </div>`;
     }).join("");
+    const hasItems=labelList.length>0;
+    document.getElementById("btnPdf").disabled=!hasItems;
+    document.getElementById("btnLog").disabled=sessionLog.length===0;
+    document.getElementById("productCount").textContent=hasItems ? `${labelList.length} product type${labelList.length!==1?"s":""} · ${total} label${total!==1?"s":""} queued` : "No products queued.";
+}
+function removeFromList(i){ labelList.splice(i,1); renderList(); }
+function updateQty(i,val){ if(labelList[i]){ labelList[i].qty=Math.max(1,parseInt(val,10)||1); renderList(); } }
 
-    const hasItems = labelList.length > 0;
-    document.getElementById("btnPdf").disabled = !hasItems;
-    document.getElementById("btnLog").disabled = sessionLog.length === 0;
-    document.getElementById("productCount").textContent = hasItems
-        ? `${labelList.length} product type${labelList.length !== 1 ? "s" : ""} · ${total} label${total !== 1 ? "s" : ""} queued`
-        : "No products queued.";
+function startEdit(idx,field,spanEl){
+    if(spanEl.querySelector("input")) return;
+    const current=field==="price" ? Number(labelList[idx].price||0).toFixed(2) : (labelList[idx][field]||"");
+    const input=document.createElement("input"); input.className="inline-input";
+    input.type=field==="price"?"number":"text"; if(field==="price"){input.step="0.01";input.min="0";}
+    input.value=current; spanEl.innerHTML=""; spanEl.appendChild(input); input.focus(); input.select();
+    const commit=()=>{ labelList[idx][field]=field==="price"?parsePriceInput(input.value.trim()):input.value.trim(); renderList(); };
+    input.addEventListener("blur",commit);
+    input.addEventListener("keydown",e=>{ if(e.key==="Enter") input.blur(); if(e.key==="Escape") renderList(); });
 }
 
-function removeFromList(i) { labelList.splice(i, 1); renderList(); }
-function updateQty(i, val) { if (labelList[i]) { labelList[i].qty = Math.max(1, parseInt(val,10)||1); renderList(); } }
-
-// ─── INLINE EDITING ──────────────────────────────────────────────────────────
-function startEdit(idx, field, spanEl) {
-    if (spanEl.querySelector("input")) return;
-    const current = field === "price"
-        ? Number(labelList[idx].price || 0).toFixed(2)
-        : (labelList[idx][field] || "");
-
-    const input = document.createElement("input");
-    input.className = "inline-input";
-    input.type  = field === "price" ? "number" : "text";
-    if (field === "price") { input.step = "0.01"; input.min = "0"; }
-    input.value = current;
-    spanEl.innerHTML = ""; spanEl.appendChild(input);
-    input.focus(); input.select();
-
-    const commit = () => {
-        labelList[idx][field] = field === "price" ? parsePriceInput(input.value.trim()) : input.value.trim();
-        renderList();
-    };
-    input.addEventListener("blur", commit);
-    input.addEventListener("keydown", e => {
-        if (e.key === "Enter")  input.blur();
-        if (e.key === "Escape") renderList();
-    });
-}
-
-// ─── EXCEL IMPORT ────────────────────────────────────────────────────────────
-function onExcelFileChosen(input) {
-    const file = input.files[0]; if (!file) return;
-    document.getElementById("chosenFileName").textContent = file.name;
-    setExcelStatus("Reading…", "");
-    const reader = new FileReader();
-    reader.onload = e => {
-        try {
-            const wb   = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
-            const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
-            if (!json.length) { setExcelStatus("Sheet appears empty.", "error"); return; }
-            excelRows = json; excelHeaders = Object.keys(json[0]);
-            populateColumnDropdowns(excelHeaders);
-            document.getElementById("colMappingSection").style.display = "block";
-            setExcelStatus(`✔ Loaded ${json.length} row(s). Map columns then click Import.`, "success");
-        } catch (err) { setExcelStatus("Failed: " + err.message, "error"); }
-    };
+function onExcelFileChosen(input){
+    const file=input.files[0]; if(!file) return;
+    document.getElementById("chosenFileName").textContent=file.name; setExcelStatus("Reading…","");
+    const reader=new FileReader();
+    reader.onload=e=>{ try {
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});
+        const json=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
+        if(!json.length){setExcelStatus("Sheet appears empty.","error");return;}
+        excelRows=json; excelHeaders=Object.keys(json[0]);
+        populateColumnDropdowns(excelHeaders);
+        document.getElementById("colMappingSection").style.display="block";
+        setExcelStatus("✔ Loaded "+json.length+" row(s). Map columns then click Import.","success");
+    } catch(err){setExcelStatus("Failed: "+err.message,"error");} };
     reader.readAsArrayBuffer(file);
 }
-
-function populateColumnDropdowns(headers) {
-    ["mapName","mapPrice","mapBarcode","mapOtherBarcodes","mapPackSize","mapPIP","mapQty"].forEach(id => {
-        const sel = document.getElementById(id);
-        sel.innerHTML = ["mapQty","mapPackSize","mapPIP","mapOtherBarcodes"].includes(id)
-            ? '<option value="">(none)</option>' : "";
-        headers.forEach(h => { const o = document.createElement("option"); o.value=h; o.textContent=h; sel.appendChild(o); });
+function populateColumnDropdowns(headers){
+    ["mapName","mapPrice","mapBarcode","mapOtherBarcodes","mapPackSize","mapPIP","mapQty"].forEach(id=>{
+        const sel=document.getElementById(id);
+        sel.innerHTML=["mapQty","mapPackSize","mapPIP","mapOtherBarcodes"].includes(id)?'<option value="">(none)</option>':"";
+        headers.forEach(h=>{ const o=document.createElement("option"); o.value=h; o.textContent=h; sel.appendChild(o); });
     });
-    // Auto-select using your exact column names first, then fallback keywords
-    autoSelectExact("mapName",          COL_NAME);
-    autoSelectExact("mapPrice",         COL_PRICE);
-    autoSelectExact("mapBarcode",       COL_BARCODE);
-    autoSelectExact("mapOtherBarcodes", COL_OTHER_BARCODES);
-    autoSelectExact("mapPackSize",      COL_PACK_SIZE);
-    autoSelectExact("mapPIP",           COL_PIP);
-    // Fallback fuzzy matches
-    autoSelect("mapName",     ["name","product","description","title","item"]);
-    autoSelect("mapPrice",    ["price","cost","rrp","retail","amount"]);
-    autoSelect("mapBarcode",  ["barcode","ean","upc","sku"]);
-    autoSelect("mapOtherBarcodes", ["other"]);
-    autoSelect("mapPackSize", ["pack","size","unit","volume","weight","tablet","ml","mg"]);
-    autoSelect("mapPIP",      ["pip"]);
-    autoSelect("mapQty",      ["qty","quantity","count"]);
+    autoSelectExact("mapName",COL_NAME); autoSelectExact("mapPrice",COL_PRICE); autoSelectExact("mapBarcode",COL_BARCODE);
+    autoSelectExact("mapOtherBarcodes",COL_OTHER_BARCODES); autoSelectExact("mapPackSize",COL_PACK_SIZE); autoSelectExact("mapPIP",COL_PIP);
+    autoSelect("mapName",["name","product","description","title","item"]); autoSelect("mapPrice",["price","cost","rrp","retail","amount"]);
+    autoSelect("mapBarcode",["barcode","ean","upc","sku"]); autoSelect("mapOtherBarcodes",["other"]);
+    autoSelect("mapPackSize",["pack","size","unit","volume","weight","tablet","ml","mg"]); autoSelect("mapPIP",["pip"]); autoSelect("mapQty",["qty","quantity","count"]);
 }
+function autoSelectExact(selectId,colName){ const sel=document.getElementById(selectId); const match=excelHeaders.find(h=>h.trim().toLowerCase()===colName.toLowerCase()); if(match) sel.value=match; }
+function autoSelect(id,keywords){ const sel=document.getElementById(id); if(sel.value) return; const lower=excelHeaders.map(h=>h.toLowerCase()); for(const kw of keywords){ const idx=lower.findIndex(h=>h.includes(kw)); if(idx!==-1){sel.value=excelHeaders[idx];return;} } }
 
-function autoSelectExact(selectId, colName) {
-    const sel = document.getElementById(selectId);
-    const match = excelHeaders.find(h => h.trim().toLowerCase() === colName.toLowerCase());
-    if (match) sel.value = match;
-}
-function autoSelect(id, keywords) {
-    const sel = document.getElementById(id);
-    if (sel.value) return; // already set by exact match
-    const lower = excelHeaders.map(h => h.toLowerCase());
-    for (const kw of keywords) {
-        const idx = lower.findIndex(h => h.includes(kw));
-        if (idx !== -1) { sel.value = excelHeaders[idx]; return; }
-    }
-}
-
-function importFromExcel() {
-    const nc  = document.getElementById("mapName").value;
-    const pc  = document.getElementById("mapPrice").value;
-    const bc  = document.getElementById("mapBarcode").value;
-    const obc = document.getElementById("mapOtherBarcodes").value;
-    const sc  = document.getElementById("mapPackSize").value;
-    const ic  = document.getElementById("mapPIP").value;
-    const qc  = document.getElementById("mapQty").value;
-    if (!nc || !pc || !bc) { setExcelStatus("Map Name, Price and Barcode first.", "error"); return; }
-
-    // Group by PIP where available
-    const pipGroups = {}, noPIPRows = [];
-    excelRows.forEach(row => {
-        const pip = ic ? String(row[ic]||"").trim() : "";
-        pip ? (pipGroups[pip] = pipGroups[pip] || [], pipGroups[pip].push(row)) : noPIPRows.push(row);
+function importFromExcel(){
+    const nc=document.getElementById("mapName").value, pc=document.getElementById("mapPrice").value, bc=document.getElementById("mapBarcode").value;
+    const obc=document.getElementById("mapOtherBarcodes").value, sc=document.getElementById("mapPackSize").value;
+    const ic=document.getElementById("mapPIP").value, qc=document.getElementById("mapQty").value;
+    if(!nc||!pc||!bc){setExcelStatus("Map Name, Price and Barcode first.","error");return;}
+    const pipGroups={},noPIPRows=[];
+    excelRows.forEach(row=>{ const pip=ic?String(row[ic]||"").trim():""; pip?(pipGroups[pip]=pipGroups[pip]||[],pipGroups[pip].push(row)):noPIPRows.push(row); });
+    let n=0;
+    Object.entries(pipGroups).forEach(([pip,rows])=>{
+        const base=rows[0];
+        const barcodes=[...new Set(rows.flatMap(r=>{ const p=String(r[bc]||"").trim(); const o=obc?String(r[obc]||"").split(",").map(s=>s.trim()).filter(Boolean):[]; return [p,...o].filter(Boolean); }))];
+        const name=String(base[nc]||"").trim(); if(!name&&!barcodes.length) return;
+        labelList.push({name:name||"(no name)",price:parsePriceInput(base[pc]),barcodes,primaryBarcode:String(base[bc]||"").trim(),pip,packSize:sc?String(base[sc]||"").trim():"",qty:qc?Math.max(1,parseInt(base[qc],10)||1):1}); n++;
     });
-
-    let n = 0;
-
-    Object.entries(pipGroups).forEach(([pip, rows]) => {
-        const base = rows[0];
-        const barcodes = [...new Set(rows.flatMap(r => {
-            const primary = String(r[bc]||"").trim();
-            const others  = obc ? String(r[obc]||"").split(",").map(s=>s.trim()).filter(Boolean) : [];
-            return [primary, ...others].filter(Boolean);
-        }))];
-        const name = String(base[nc]||"").trim();
-        if (!name && !barcodes.length) return;
-        labelList.push({
-            name: name || "(no name)", price: parsePriceInput(base[pc]),
-            barcodes, primaryBarcode: String(base[bc]||"").trim(),
-            pip, packSize: sc ? String(base[sc]||"").trim() : "",
-            qty: qc ? Math.max(1, parseInt(base[qc],10)||1) : 1
-        });
-        n++;
+    noPIPRows.forEach(row=>{
+        const primary=String(row[bc]||"").trim(), others=obc?String(row[obc]||"").split(",").map(s=>s.trim()).filter(Boolean):[];
+        const barcodes=[...new Set([primary,...others].filter(Boolean))], name=String(row[nc]||"").trim();
+        if(!name&&!barcodes.length) return;
+        labelList.push({name:name||"(no name)",price:parsePriceInput(row[pc]),barcodes,primaryBarcode:primary,pip:"",packSize:sc?String(row[sc]||"").trim():"",qty:qc?Math.max(1,parseInt(row[qc],10)||1):1}); n++;
     });
-
-    noPIPRows.forEach(row => {
-        const primary = String(row[bc]||"").trim();
-        const others  = obc ? String(row[obc]||"").split(",").map(s=>s.trim()).filter(Boolean) : [];
-        const barcodes = [...new Set([primary, ...others].filter(Boolean))];
-        const name = String(row[nc]||"").trim();
-        if (!name && !barcodes.length) return;
-        labelList.push({
-            name: name || "(no name)", price: parsePriceInput(row[pc]),
-            barcodes, primaryBarcode: primary, pip: "",
-            packSize: sc ? String(row[sc]||"").trim() : "",
-            qty: qc ? Math.max(1, parseInt(row[qc],10)||1) : 1
-        });
-        n++;
-    });
-
-    renderList();
-    setExcelStatus(`✔ Imported ${n} product(s).`, "success");
+    renderList(); setExcelStatus("✔ Imported "+n+" product(s).","success");
 }
-function setExcelStatus(msg, cls) { const el=document.getElementById("excelStatus"); el.textContent=msg; el.className=cls||""; }
+function setExcelStatus(msg,cls){ const el=document.getElementById("excelStatus"); el.textContent=msg; el.className=cls||""; }
 
-// ─── GENERATE PDF ────────────────────────────────────────────────────────────
-async function generatePDF() {
-    if (!labelList.length) return;
+async function generatePDF(){
+    if(!labelList.length) return;
     try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit:"mm", format:[58,38], orientation:"landscape" });
-        let first = true;
-        for (const item of labelList) {
-            for (let c = 0; c < (item.qty||1); c++) {
-                if (!first) doc.addPage(); first = false;
-                doc.setFont("helvetica","normal"); doc.setFontSize(12);
-                doc.text(doc.splitTextToSize(item.name,48).slice(0,2), 5, 6);
-                if (item.packSize) {
-                    doc.setFont("helvetica","normal"); doc.setFontSize(10);
-                    doc.text(String(item.packSize), 5, 17);
-                }
-                doc.setFont("helvetica","bold"); doc.setFontSize(30);
-                doc.text(formatPrice(item.price), 5, 33);
-            }
-        }
+        const {jsPDF}=window.jspdf, doc=new jsPDF({unit:"mm",format:[58,38],orientation:"landscape"});
+        let first=true;
+        for(const item of labelList){ for(let c=0;c<(item.qty||1);c++){
+            if(!first) doc.addPage(); first=false;
+            doc.setFont("helvetica","normal"); doc.setFontSize(12);
+            doc.text(doc.splitTextToSize(item.name,48).slice(0,2),5,6);
+            if(item.packSize){ doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.text(String(item.packSize),5,17); }
+            doc.setFont("helvetica","bold"); doc.setFontSize(30); doc.text(formatPrice(item.price),5,33);
+        }}
         doc.save("labels.pdf");
-        sessionLog.push({
-            timestamp:   new Date().toLocaleString("en-GB"),
-            products:    labelList.map(p => ({ ...p })),
-            totalLabels: labelList.reduce((s,p) => s+(p.qty||1), 0)
-        });
-        document.getElementById("btnLog").disabled = false;
-        showToast("PDF generated!", "rgb(40,51,130)");
-    } catch (err) { console.error(err); showToast("PDF generation failed.", "crimson"); }
+        sessionLog.push({timestamp:new Date().toLocaleString("en-GB"),products:labelList.map(p=>({...p})),totalLabels:labelList.reduce((s,p)=>s+(p.qty||1),0)});
+        document.getElementById("btnLog").disabled=false; showToast("PDF generated!","rgb(40,51,130)");
+    } catch(err){ console.error(err); showToast("PDF generation failed.","crimson"); }
 }
 
-// ─── SESSION LOG ─────────────────────────────────────────────────────────────
-function downloadSessionLog() {
-    if (!sessionLog.length) return;
-    const rows = ["Timestamp,Product Name,Primary Barcode,Other Barcodes,PIP,Pack Size,Price,Qty"];
-    sessionLog.forEach(run => {
-        run.products.forEach(p => {
-            const primary = p.primaryBarcode || "";
-            const others  = (p.barcodes || []).filter(b => b !== primary).join("; ");
-            rows.push([
-                `"${run.timestamp}"`,
-                `"${(p.name||"").replace(/"/g,'""')}"`,
-                `"${primary.replace(/"/g,'""')}"`,
-                `"${others.replace(/"/g,'""')}"`,
-                `"${(p.pip||"").replace(/"/g,'""')}"`,
-                `"${(p.packSize||"").replace(/"/g,'""')}"`,
-                formatPrice(p.price),
-                p.qty||1
-            ].join(","));
-        });
-    });
-    triggerDownload(`label_session_${new Date().toISOString().slice(0,10)}.csv`, rows.join("\n"));
+function downloadSessionLog(){
+    if(!sessionLog.length) return;
+    const rows=["Timestamp,Product Name,Primary Barcode,Other Barcodes,PIP,Pack Size,Price,Qty"];
+    sessionLog.forEach(run=>{ run.products.forEach(p=>{
+        const primary=p.primaryBarcode||"", others=(p.barcodes||[]).filter(b=>b!==primary).join("; ");
+        rows.push([`"${run.timestamp}"`,`"${(p.name||"").replace(/"/g,'""')}"`,`"${primary.replace(/"/g,'""')}"`,`"${others.replace(/"/g,'""')}"`,`"${(p.pip||"").replace(/"/g,'""')}"`,`"${(p.packSize||"").replace(/"/g,'""')}"`,formatPrice(p.price),p.qty||1].join(","));
+    }); });
+    triggerDownload("label_session_"+new Date().toISOString().slice(0,10)+".csv",rows.join("\n"));
 }
 
-// ─── CSV PARSE ───────────────────────────────────────────────────────────────
-function parseCSVToObjects(text) {
-    const lines = text.trim().split("\n");
-    if (lines.length < 2) return [];
-    const headers = parseCSVLine(lines[0]);
-    return lines.slice(1).map(line => {
-        const vals = parseCSVLine(line), obj = {};
-        headers.forEach((h,i) => obj[h.trim()] = (vals[i]||"").trim());
-        return obj;
-    }).filter(row => Object.values(row).some(v => v));
+function parseCSVToObjects(text){
+    const lines=text.trim().split("\n"); if(lines.length<2) return [];
+    const headers=parseCSVLine(lines[0]);
+    return lines.slice(1).map(line=>{ const vals=parseCSVLine(line),obj={}; headers.forEach((h,i)=>obj[h.trim()]=(vals[i]||"").trim()); return obj; }).filter(row=>Object.values(row).some(v=>v));
 }
-function parseCSVLine(line) {
-    const result=[]; let cur="", inQ=false;
-    for (let i=0; i<line.length; i++) {
-        const ch=line[i];
-        if (ch==='"'&&inQ&&line[i+1]==='"') { cur+='"'; i++; }
-        else if (ch==='"') inQ=!inQ;
-        else if (ch===','&&!inQ) { result.push(cur); cur=""; }
-        else cur+=ch;
-    }
-    result.push(cur); return result;
+function parseCSVLine(line){
+    const result=[]; let cur="",inQ=false;
+    for(let i=0;i<line.length;i++){ const ch=line[i];
+        if(ch==='"'&&inQ&&line[i+1]==='"'){cur+='"';i++;} else if(ch==='"') inQ=!inQ; else if(ch===','&&!inQ){result.push(cur);cur="";} else cur+=ch;
+    } result.push(cur); return result;
 }
 
-// ─── UTILS ───────────────────────────────────────────────────────────────────
-function parsePriceInput(str) { const n=parseFloat(String(str??"").replace(/[^\d.-]/g,"")); return isNaN(n)?0:n; }
-function formatPrice(num) { return "£"+Number(num||0).toFixed(2); }
-function escHtml(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function triggerDownload(filename, text) { const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:"text/csv"})); a.download=filename; a.click(); }
+function parsePriceInput(str){ const n=parseFloat(String(str??"").replace(/[^\d.-]/g,"")); return isNaN(n)?0:n; }
+function formatPrice(num){ return "£"+Number(num||0).toFixed(2); }
+function escHtml(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function triggerDownload(filename,text){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:"text/csv"})); a.download=filename; a.click(); }
 
 let _tt;
-function showToast(msg, color) {
+function showToast(msg,color){
     let t=document.getElementById("_toast");
-    if (!t) {
-        t=document.createElement("div"); t.id="_toast";
-        Object.assign(t.style,{position:"fixed",bottom:"80px",right:"24px",color:"#fff",padding:"12px 18px",borderRadius:"10px",fontSize:"0.88em",fontWeight:"bold",boxShadow:"0 4px 14px rgba(0,0,0,0.22)",zIndex:"200",transition:"opacity 0.4s",opacity:"0",maxWidth:"320px",lineHeight:"1.4"});
-        document.body.appendChild(t);
-    }
+    if(!t){ t=document.createElement("div"); t.id="_toast"; Object.assign(t.style,{position:"fixed",bottom:"80px",right:"24px",color:"#fff",padding:"12px 18px",borderRadius:"10px",fontSize:"0.88em",fontWeight:"bold",boxShadow:"0 4px 14px rgba(0,0,0,0.22)",zIndex:"200",transition:"opacity 0.4s",opacity:"0",maxWidth:"320px",lineHeight:"1.4"}); document.body.appendChild(t); }
     t.style.background=color||"#333"; t.textContent=msg; t.style.opacity="1";
     clearTimeout(_tt); _tt=setTimeout(()=>t.style.opacity="0",3800);
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-    renderList(); renderUnmatched(); loadProductsCSV();
-});
+window.addEventListener("DOMContentLoaded",()=>{ renderList(); renderUnmatched(); loadProductsCSV(); });
 </script>
 </body>
 </html>
