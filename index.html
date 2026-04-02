@@ -179,6 +179,7 @@
       <div class="unmatched-empty">No unmatched codes yet.</div>
     </div>
     <div class="unmatched-actions">
+      <button id="copyUnmatchedBtn" onclick="copyUnmatched()" disabled>📋 Copy to Clipboard</button>
       <button id="downloadUnmatchedBtn" onclick="downloadUnmatched()" disabled>⬇ Download CSV</button>
       <button id="clearUnmatchedBtn" onclick="clearUnmatched()" disabled style="background:#c0392b;">🗑 Clear List</button>
     </div>
@@ -284,11 +285,20 @@ function clearBulkBarcodes(){ document.getElementById("bulkBarcodes").value=""; 
 
 function renderUnmatched(){
     document.getElementById("unmatchedBadge").textContent=unmatchedCodes.length;
+    document.getElementById("copyUnmatchedBtn").disabled=!unmatchedCodes.length;
     document.getElementById("downloadUnmatchedBtn").disabled=!unmatchedCodes.length;
     document.getElementById("clearUnmatchedBtn").disabled=!unmatchedCodes.length;
     document.getElementById("unmatchedList").innerHTML=unmatchedCodes.length ? unmatchedCodes.map(c=>`<div class="unmatched-item">${escHtml(c)}</div>`).join("") : '<div class="unmatched-empty">No unmatched codes yet.</div>';
 }
 function downloadUnmatched(){ triggerDownload("unmatched_codes.csv","code\n"+unmatchedCodes.join("\n")); }
+function copyUnmatched(){
+    if(!unmatchedCodes.length) return;
+    navigator.clipboard.writeText(unmatchedCodes.join("\n")).then(()=>{
+        showToast("Copied "+unmatchedCodes.length+" code(s) to clipboard.","rgb(40,51,130)");
+    }).catch(()=>{
+        showToast("Copy failed — try the Download CSV instead.","crimson");
+    });
+}
 function clearUnmatched(){
     if(!unmatchedCodes.length) return;
     if(!confirm("Clear all "+unmatchedCodes.length+" unmatched code(s)?")) return;
