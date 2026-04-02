@@ -73,6 +73,9 @@
         .btn-log { background: rgb(40,51,130); color: white; }
         .btn-log:hover { background: rgb(60,75,180); }
         .btn-log:disabled, .btn-pdf:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-clear { background: #c0392b; color: white; }
+        .btn-clear:hover { background: #a93226; }
+        .btn-clear:disabled { background: #ccc; cursor: not-allowed; }
         .btn-pdf { background: #FF9800; color: white; }
         .btn-pdf:hover { background: #F57C00; }
         .bottom-spacer { height: 70px; }
@@ -187,6 +190,7 @@
 </div>
 <div class="action-bar">
   <div class="product-count" id="productCount">No products queued.</div>
+  <button class="btn-clear" id="btnClear" onclick="clearQueue()" disabled>🗑 Clear Queue</button>
   <button class="btn-log" id="btnLog" onclick="downloadSessionLog()" disabled>⬇ Session Log</button>
   <button class="btn-pdf" id="btnPdf" onclick="generatePDF()" disabled>🖨 Generate Labels PDF</button>
 </div>
@@ -336,8 +340,16 @@ function renderList(){
     }).join("");
     const hasItems=labelList.length>0;
     document.getElementById("btnPdf").disabled=!hasItems;
+    document.getElementById("btnClear").disabled=!hasItems;
     document.getElementById("btnLog").disabled=sessionLog.length===0;
     document.getElementById("productCount").textContent=hasItems ? `${labelList.length} product type${labelList.length!==1?"s":""} · ${total} label${total!==1?"s":""} queued` : "No products queued.";
+}
+function clearQueue(){
+    if(!labelList.length) return;
+    if(!confirm("Clear all "+labelList.length+" product(s) from the queue?")) return;
+    labelList=[];
+    renderList();
+    showToast("Queue cleared.","#c0392b");
 }
 function removeFromList(i){ labelList.splice(i,1); renderList(); }
 function updateQty(i,val){ if(labelList[i]){ labelList[i].qty=Math.max(1,parseInt(val,10)||1); renderList(); } }
