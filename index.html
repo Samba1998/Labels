@@ -276,13 +276,15 @@ function lookupSingle(){
 document.getElementById("barcodeInput").addEventListener("keypress",e=>{ if(e.key==="Enter") lookupSingle(); });
 
 function processBulkBarcodes(){
-    const codes=document.getElementById("bulkBarcodes").value.split(/\n+/).flatMap(l=>l.split(/[\s,]+/)).map(s=>s.trim()).filter(Boolean);
+    const raw=document.getElementById("bulkBarcodes").value.split(/\n+/).flatMap(l=>l.split(/[\s,]+/)).map(s=>s.trim()).filter(Boolean);
+    const codes=[...new Set(raw)]; // deduplicate before lookup
+    const dupeCount=raw.length-codes.length;
     if(!codes.length) return;
     if(!productDB.length){ showToast("Product database not loaded yet.","crimson"); return; }
     let matched=0,skipped=0,newUnmatched=[];
     codes.forEach(code=>{ const label=findProduct(code); if(label){ if(alreadyQueued(label)) skipped++; else { labelList.push(label); matched++; } } else { if(!unmatchedCodes.includes(code)) newUnmatched.push(code); } });
     unmatchedCodes=[...unmatchedCodes,...newUnmatched]; renderList(); renderUnmatched();
-    const parts=["✔ "+matched+" added"]; if(skipped) parts.push(skipped+" already queued"); if(newUnmatched.length) parts.push(newUnmatched.length+" unmatched");
+    const parts=["✔ "+matched+" added"]; if(skipped) parts.push(skipped+" already queued"); if(newUnmatched.length) parts.push(newUnmatched.length+" unmatched"); if(dupeCount>0) parts.push(dupeCount+" duplicate"+(dupeCount!==1?"s":"")+" removed");
     document.getElementById("bulkStatus").textContent=parts.join(" · ");
 }
 function clearBulkBarcodes(){ document.getElementById("bulkBarcodes").value=""; document.getElementById("bulkStatus").textContent=""; }
